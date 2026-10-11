@@ -161,18 +161,18 @@ require_once __DIR__ . '/includes/navbar.php';
                     
                     <div class="mb-4">
                         <h5 style="color: var(--accent); font-family: var(--font-body); font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">
-                            <i class="fas fa-graduation-cap me-2"></i>Project
+                            <i class="fas fa-building me-2"></i>Editorial Bureau
                         </h5>
-                        <p style="color: rgba(255,255,255,0.6); margin-bottom: 0; font-size: 0.92rem;">TYBScIT (AI/ML)</p>
-                        <p style="color: rgba(255,255,255,0.6); margin-bottom: 0; font-size: 0.92rem;">GLS University</p>
+                        <p style="color: rgba(255,255,255,0.6); margin-bottom: 0; font-size: 0.92rem;">The Newsroom Central Bureau</p>
+                        <p style="color: rgba(255,255,255,0.6); margin-bottom: 0; font-size: 0.92rem;">Press Club Enclave</p>
                     </div>
                     
                     <div class="mb-4">
                         <h5 style="color: var(--accent); font-family: var(--font-body); font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">
-                            <i class="fas fa-map-marker-alt me-2"></i>Location
+                            <i class="fas fa-map-marker-alt me-2"></i>Headquarters
                         </h5>
-                        <p style="color: rgba(255,255,255,0.6); margin-bottom: 0; font-size: 0.92rem;">GLS University Campus</p>
-                        <p style="color: rgba(255,255,255,0.6); margin-bottom: 0; font-size: 0.92rem;">Ahmedabad, Gujarat</p>
+                        <p style="color: rgba(255,255,255,0.6); margin-bottom: 0; font-size: 0.92rem;">Ashram Road, Navrangpura</p>
+                        <p style="color: rgba(255,255,255,0.6); margin-bottom: 0; font-size: 0.92rem;">Ahmedabad, Gujarat 380009</p>
                     </div>
                     
                     <div style="margin-top: auto; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.1);">

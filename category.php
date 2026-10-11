@@ -110,7 +110,7 @@ $remainingNews = array_slice($newsList, 1);
                 <div class="row g-5 align-items-center">
                     <div class="col-md-7">
                         <a href="<?= buildUrl('news.php', ['slug' => $featuredArticle['slug']]) ?>" class="d-block">
-                            <img src="<?= e(newsImageUrl($featuredArticle['featured_image'])) ?>" alt="<?= e($featuredArticle['title']) ?>" style="width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 0;">
+                            <img src="<?= e(newsImageUrl($featuredArticle['featured_image'], $category['slug'])) ?>" alt="<?= e($featuredArticle['title']) ?>" style="width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 0;">
                         </a>
                     </div>
                     <div class="col-md-5">
@@ -138,7 +138,7 @@ $remainingNews = array_slice($newsList, 1);
                 <div class="col-md-6 col-lg-4">
                     <div class="card story-card h-100 border-0 bg-transparent">
                         <a href="<?= buildUrl('news.php', ['slug' => $news['slug']]) ?>" class="story-img-wrap" style="aspect-ratio: 4/3; border-radius: 0;">
-                            <img src="<?= e(newsImageUrl($news['featured_image'])) ?>" alt="<?= e($news['title']) ?>" loading="lazy">
+                            <img src="<?= e(newsImageUrl($news['featured_image'], $category['slug'])) ?>" alt="<?= e($news['title']) ?>" loading="lazy">
                         </a>
                         <div class="card-body px-0 pt-4 flex-column">
                             <h4 class="story-title" style="font-size: 1.4rem;">

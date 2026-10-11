@@ -78,7 +78,7 @@ header('Referrer-Policy: strict-origin-when-cross-origin');
             </p>
             <div style="margin-top: 40px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.1);">
                 <p style="font-size: 0.82rem; color: rgba(255,255,255,0.4);">
-                    <i class="fas fa-graduation-cap me-2"></i> TYBScIT (AI/ML) · GLS University
+                    <i class="fas fa-shield-alt me-2"></i> Editorial &amp; Reader Secure Portal
                 </p>
             </div>
         </div>

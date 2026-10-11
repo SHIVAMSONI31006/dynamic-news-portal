@@ -35,6 +35,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($short_description)) $errors[] = "Short description is required.";
     if (empty($content)) $errors[] = "Content is required.";
     if (!in_array($status, ['draft', 'published', 'archived'])) $errors[] = "Invalid status.";
+    if (preg_match('/\?{2,}/', $title) || preg_match('/\?{2,}/', $short_description) || preg_match('/\?{2,}/', $content)) {
+        $errors[] = "Editorial Quality Warning: Suspicious repeated question marks ('??') detected. Please replace with proper punctuation (em-dash '—' or currency '₹').";
+    }
     
     // Fetch old record for image deletion/retention
     $stmt = $pdo->prepare("SELECT featured_image, slug, status, published_at FROM news WHERE id = :id");

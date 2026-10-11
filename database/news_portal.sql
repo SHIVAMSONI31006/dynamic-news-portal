@@ -265,7 +265,7 @@ INSERT INTO `categories` (`name`, `slug`, `description`, `status`) VALUES
 -- ------------------------------------------------------------
 
 INSERT INTO `news`
-    (`category_id`, `author_id`, `title`, `slug`, `short_description`, `content`, `status`, `is_featured`, `is_breaking`, `views`, `published_at`)
+    (`category_id`, `author_id`, `title`, `slug`, `short_description`, `content`, `featured_image`, `status`, `is_featured`, `is_breaking`, `views`, `published_at`)
 VALUES
 -- Article 1: Featured + Breaking — AI & ML (category 5)
 (5, 1,
@@ -284,6 +284,7 @@ VALUES
 <p>The Prime Minister stated, "Artificial Intelligence is not just a technology — it is a transformational force that will redefine how India solves its biggest challenges, from healthcare to agriculture to education."</p>
 <p>The mission will be implemented in three phases, with Phase 1 focusing on infrastructure and talent development. Leading institutions like IITs, IIITs, and private tech companies will be partners in this initiative.</p>
 <p>Industry leaders have welcomed the announcement, calling it a game-changer for India\'s technology landscape. The mission is expected to create over 500,000 new AI-related jobs by 2030.</p>',
+ 'uploads/news/ai-mission-india.jpg',
  'published', 1, 1, 1247,
  '2026-09-24 08:00:00'),
 
@@ -296,6 +297,7 @@ VALUES
 <p>The RLV, nicknamed "Pushpak," completed all test objectives perfectly. This technology could reduce launch costs by up to 80%, making space more accessible.</p>
 <p>"This is a proud moment for Indian space technology," said the ISRO Chairman. "Reusable launch vehicles represent the future of space access, and India is now firmly in this race."</p>
 <p>The next phase will involve orbital re-entry tests planned for 2027. If successful, India will join the US and Europe as the only nations with operational reusable launch vehicle technology.</p>',
+ 'uploads/news/isro-reusable-vehicle.jpg',
  'published', 1, 0, 893,
  '2026-09-23 14:30:00'),
 
@@ -312,6 +314,7 @@ VALUES
 </ul>
 <p>The project is estimated to cost ₹7,500 crore and is expected to be completed by 2029. It will serve an estimated 4 lakh daily passengers.</p>
 <p>Chief Minister stated that this expansion will significantly improve connectivity for students, professionals, and residents across Ahmedabad.</p>',
+ 'uploads/news/ahmedabad-metro-rail.jpg',
  'published', 0, 1, 562,
  '2026-09-24 10:15:00'),
 
@@ -335,6 +338,7 @@ VALUES
     <li>Digital infrastructure push for Tier-2 and Tier-3 cities</li>
 </ul>
 <p>Industry experts have called this budget "forward-looking" with its emphasis on building a knowledge economy.</p>',
+ 'uploads/news/union-budget-2026.jpg',
  'published', 0, 0, 1105,
  '2026-09-22 09:00:00'),
 
@@ -353,6 +357,7 @@ VALUES
 </ul>
 <p>AI-related services alone are expected to contribute $50 billion, making India the largest AI services exporter globally.</p>
 <p>Hiring in the IT sector is also expected to revive, with an estimated 300,000 new jobs being created, primarily in AI, data science, and cloud engineering roles.</p>',
+ 'uploads/news/indian-it-industry.jpg',
  'published', 0, 0, 734,
  '2026-09-21 11:00:00'),
 
@@ -371,26 +376,28 @@ VALUES
 </ul>
 <p>The BCCI congratulated the team, calling it "one of the greatest achievements in Indian cricket history."</p>
 <p>Captain said in the post-match ceremony: "This team has belief, resilience and hunger. We came here to win, and we did."</p>',
+ 'uploads/news/india-cricket-australia.jpg',
  'published', 0, 0, 2340,
  '2026-09-20 18:00:00'),
 
 -- Article 7: Regular — Education (category 7)
 (7, 1,
- 'GLS University Introduces New AI & ML Specialization in BScIT Program',
- 'gls-university-ai-ml-specialization',
- 'GLS University has announced a new AI & ML specialization track within its BScIT program, aligning with industry demand for AI professionals.',
- '<p>GLS University, Ahmedabad, has announced the introduction of a specialized AI & Machine Learning track within its Bachelor of Science in Information Technology (BScIT) program.</p>
-<p>The new specialization will cover:</p>
+ 'Leading National Universities Introduce Advanced AI Curriculum Framework',
+ 'national-universities-advanced-ai-curriculum',
+ 'Indian universities announce an advanced AI and Machine Learning curriculum framework to equip students with industry-ready deep learning skills.',
+ '<p>Leading Indian universities and technical institutes have announced the rollout of an advanced Artificial Intelligence and Machine Learning curriculum framework aligned with the National Education Policy.</p>
+<p>The specialized curriculum covers:</p>
 <ul>
     <li>Fundamentals of Machine Learning</li>
     <li>Deep Learning and Neural Networks</li>
     <li>Natural Language Processing</li>
     <li>Computer Vision</li>
     <li>AI Ethics and Responsible AI</li>
-    <li>Capstone Project with Industry Mentorship</li>
+    <li>Capstone Projects with Industry Mentorship</li>
 </ul>
-<p>The program is designed to produce industry-ready AI professionals who can contribute to India\'s growing AI ecosystem.</p>
-<p>"Our students will not just learn AI theory — they will build real AI solutions," said the Department Head.</p>',
+<p>The program is designed to produce industry-ready AI professionals who can contribute to India\'s rapidly growing tech ecosystem.</p>
+<p>"Students will not just learn AI theory — they will build real AI solutions that address pressing societal and industrial challenges," said academic council representatives.</p>',
+ 'uploads/news/ai-curriculum-framework.jpg',
  'published', 0, 0, 456,
  '2026-09-19 10:00:00'),
 
@@ -403,6 +410,7 @@ VALUES
 <p>The film tells the story of an AI researcher who creates a machine learning model that develops unexpected emergent behaviours, raising profound questions about consciousness and ethics.</p>
 <p>Director stated: "I wanted to tell a story that resonates with the AI era we live in. What happens when the algorithm we create starts asking questions we cannot answer?"</p>
 <p>The film has been praised for its scientifically accurate portrayal of machine learning concepts and its emotional depth. It is set for a worldwide release next month.</p>',
+ 'uploads/news/international-film-awards.jpg',
  'published', 0, 0, 678,
  '2026-09-18 16:00:00'),
 
@@ -422,6 +430,7 @@ VALUES
 </ul>
 <p>India\'s delegation played a significant role in ensuring that the framework balances innovation with safety, particularly for developing nations.</p>
 <p>The framework will be implemented in phases, with signatory nations expected to establish national AI safety bodies by 2028.</p>',
+ 'uploads/news/global-ai-safety-summit.jpg',
  'published', 0, 0, 891,
  '2026-09-17 12:00:00'),
 
@@ -437,6 +446,7 @@ VALUES
     <li>Quantum-AI integration</li>
     <li>Commercial quantum applications</li>
 </ul>',
+ NULL,
  'draft', 0, 0, 0,
  NULL);
 

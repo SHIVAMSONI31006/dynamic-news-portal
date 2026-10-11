@@ -39,8 +39,8 @@ $fullTitle = $pageTitle === APP_NAME
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="<?= isset($pageMetaDesc) ? e($pageMetaDesc) : e($pageTitle) . ' — Dynamic News Portal built with PHP and MySQL. Browse the latest news, trending articles, and more.' ?>">
-    <meta name="author" content="TYBScIT (AI/ML), GLS University">
+    <meta name="description" content="<?= isset($pageMetaDesc) ? e($pageMetaDesc) : e($pageTitle) . ' — ' . e(APP_NAME) . '. Breaking news, investigative reporting, world affairs, technology, and in-depth analysis.' ?>">
+    <meta name="author" content="The Newsroom Editorial Board">
     
     <?php if (isset($currentUrl)): ?>
     <link rel="canonical" href="<?= e($currentUrl) ?>">

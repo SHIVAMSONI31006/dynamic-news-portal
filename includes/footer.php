@@ -91,8 +91,8 @@ if (!isset($navCategories)) {
                 </form>
 
                 <div class="footer-contact mt-3">
-                    <p><i class="fas fa-map-marker-alt"></i> GLS University, Ahmedabad</p>
-                    <p><i class="fas fa-envelope"></i> info@newsportal.local</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Press Club Enclave, Ahmedabad, Gujarat</p>
+                    <p><i class="fas fa-envelope"></i> editorial@newsportal.local</p>
                 </div>
             </div>
 
@@ -103,12 +103,12 @@ if (!isset($navCategories)) {
             <div class="row align-items-center">
                 <div class="col-md-6">
                     <p class="mb-0">
-                        &copy; <?= date('Y') ?> <strong><?= e(APP_NAME) ?></strong> · GLS University
+                        &copy; <?= date('Y') ?> <strong><?= e(APP_NAME) ?></strong> &bull; All Rights Reserved.
                     </p>
                 </div>
                 <div class="col-md-6 text-md-end">
                     <p class="mb-0">
-                        TYBScIT (AI/ML) · Built with PHP & MySQL
+                        Independent Journalism &bull; Published Dynamically
                     </p>
                 </div>
             </div>

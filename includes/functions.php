@@ -626,16 +626,30 @@ function sanitizeFilename(string $filename): string
 }
 
 /**
- * Get the URL for a news article's featured image.
- * Returns a default placeholder if no image is set.
+ * Get the browser URL for a news article's featured image.
+ * Returns category-tailored visual or default editorial placeholder if no image is set.
  *
- * @param  string|null $imagePath  Stored image path from database
- * @return string                  URL to the image
+ * @param  string|null $imagePath     Stored image path from database
+ * @param  string|null $categorySlug  Optional category slug for tailored fallback
+ * @return string                     URL to the image
  */
-function newsImageUrl(?string $imagePath): string
+function newsImageUrl(?string $imagePath, ?string $categorySlug = null): string
 {
-    if (!empty($imagePath) && file_exists(projectRoot() . '/' . $imagePath)) {
-        return url($imagePath);
+    if (!empty($imagePath)) {
+        $cleanPath = ltrim($imagePath, '/\\');
+        if (file_exists(projectRoot() . '/' . $cleanPath)) {
+            return url($cleanPath);
+        }
     }
+
+    if (!empty($categorySlug)) {
+        $slugClean = preg_replace('/[^a-z0-9_-]/', '', strtolower($categorySlug));
+        $catFallback = 'assets/images/categories/' . $slugClean . '.jpg';
+        if (file_exists(projectRoot() . '/' . $catFallback)) {
+            return url($catFallback);
+        }
+    }
+
     return url('assets/images/default-news.jpg');
 }
+

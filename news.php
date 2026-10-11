@@ -141,7 +141,7 @@ $encodedTitle = urlencode($article['title']);
 
     <!-- Featured Image -->
     <div class="container-fluid px-0 px-md-4">
-        <img src="<?= e(newsImageUrl($article['featured_image'])) ?>" alt="<?= e($article['title']) ?>" class="article-featured-image shadow-sm" loading="lazy">
+        <img src="<?= e(newsImageUrl($article['featured_image'], $article['category_slug'] ?? null)) ?>" alt="<?= e($article['title']) ?>" class="article-featured-image shadow-sm" loading="lazy">
     </div>
 
     <div class="container">
@@ -264,7 +264,7 @@ $encodedTitle = urlencode($article['title']);
                 <div class="col-md-6 col-lg-3">
                     <div class="card story-card text-center">
                         <a href="<?= buildUrl('news.php', ['slug' => $related['slug']]) ?>" class="story-img-wrap" style="aspect-ratio: 4/3; border-radius: 0;">
-                            <img src="<?= e(newsImageUrl($related['featured_image'])) ?>" alt="<?= e($related['title']) ?>">
+                            <img src="<?= e(newsImageUrl($related['featured_image'], $related['category_slug'] ?? null)) ?>" alt="<?= e($related['title']) ?>">
                         </a>
                         <div class="card-body px-0 pt-3">
                             <span class="story-cat mx-auto" style="margin-bottom: 12px;"><?= e($related['category_name']) ?></span>

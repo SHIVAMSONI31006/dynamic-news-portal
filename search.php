@@ -142,7 +142,7 @@ require_once __DIR__ . '/includes/navbar.php';
                 <?php foreach ($newsList as $news): ?>
                 <div class="d-flex flex-column flex-md-row gap-4 pb-4 mb-4" style="border-bottom: 1px solid var(--line);">
                     <a href="<?= buildUrl('news.php', ['slug' => $news['slug']]) ?>" style="flex-shrink: 0; display: block; width: 100%; max-width: 320px;">
-                        <img src="<?= e(newsImageUrl($news['featured_image'])) ?>" alt="<?= e($news['title']) ?>" loading="lazy" style="width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 0;">
+                        <img src="<?= e(newsImageUrl($news['featured_image'], $news['category_slug'] ?? null)) ?>" alt="<?= e($news['title']) ?>" loading="lazy" style="width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 0;">
                     </a>
                     <div class="d-flex flex-column justify-content-center">
                         <a href="<?= buildUrl('category.php', ['slug' => $news['category_slug']]) ?>" class="story-cat mb-2" style="align-self: flex-start;">

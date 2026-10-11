@@ -32,7 +32,7 @@ $currentScript = basename($_SERVER['SCRIPT_NAME'] ?? '');
                 <i class="far fa-calendar-alt"></i> <?= date('l, d F Y') ?>
             </span>
             <span class="d-flex align-items-center gap-2 d-none d-md-flex">
-                <i class="fas fa-graduation-cap"></i> TYBScIT (AI/ML) · GLS University
+                <i class="fas fa-globe"></i> National Edition &bull; Independent Journalism
             </span>
         </div>
         <div class="d-flex align-items-center gap-4">

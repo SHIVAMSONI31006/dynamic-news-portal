@@ -97,9 +97,9 @@ require_once __DIR__ . '/includes/navbar.php';
                 </section>
 
                 <section style="background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-md); padding: 36px;">
-                    <h3 style="font-family: var(--font-display); font-size: 1.3rem; margin-bottom: 12px;">Project Context</h3>
+                    <h3 style="font-family: var(--font-display); font-size: 1.3rem; margin-bottom: 12px;">Editorial Mission &amp; Standards</h3>
                     <p style="color: var(--muted); margin-bottom: 0; line-height: 1.7;">
-                        This News Portal is developed as an educational project for the <strong style="color: var(--ink);">TYBScIT (AI/ML)</strong> program at <strong style="color: var(--ink);">GLS University</strong>. It demonstrates practical implementation of full-stack web development principles, database architecture, and application security.
+                        <strong style="color: var(--ink);"><?= e(APP_NAME) ?></strong> is committed to independent journalism, transparent reporting, and high factual integrity. Our reporters and editorial desks cover developing national stories, scientific breakthroughs, technological innovation, economic policy, and international affairs with objectivity, rigor, and depth.
                     </p>
                 </section>
 

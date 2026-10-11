@@ -109,7 +109,7 @@ require_once __DIR__ . '/includes/navbar.php';
                 <?php if (!empty($heroNewsList)): ?>
                 <?php $leadStory = $heroNewsList[0]; ?>
                 <div class="hero-carousel shadow-sm">
-                    <img src="<?= e(newsImageUrl($leadStory['featured_image'])) ?>" alt="<?= e($leadStory['title']) ?>">
+                    <img src="<?= e(newsImageUrl($leadStory['featured_image'], $leadStory['category_slug'] ?? null)) ?>" alt="<?= e($leadStory['title']) ?>">
                     <div class="hero-overlay">
                         <a href="<?= buildUrl('category.php', ['slug' => $leadStory['category_slug']]) ?>" class="category-badge">
                             <?= e($leadStory['category_name']) ?>
@@ -146,7 +146,7 @@ require_once __DIR__ . '/includes/navbar.php';
                     ?>
                     <div class="story-card d-flex gap-3 align-items-center">
                         <a href="<?= buildUrl('news.php', ['slug' => $sec['slug']]) ?>" style="width: 120px; height: 120px; flex-shrink: 0;">
-                            <img src="<?= e(newsImageUrl($sec['featured_image'])) ?>" alt="<?= e($sec['title']) ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                            <img src="<?= e(newsImageUrl($sec['featured_image'], $sec['category_slug'] ?? null)) ?>" alt="<?= e($sec['title']) ?>" style="width: 100%; height: 100%; object-fit: cover;">
                         </a>
                         <div>
                             <span class="story-cat"><?= e($sec['category_name']) ?></span>
@@ -195,7 +195,7 @@ require_once __DIR__ . '/includes/navbar.php';
                     <div class="col-md-6">
                         <div class="card story-card">
                             <a href="<?= buildUrl('news.php', ['slug' => $news['slug']]) ?>" class="story-img-wrap">
-                                <img src="<?= e(newsImageUrl($news['featured_image'])) ?>" alt="<?= e($news['title']) ?>">
+                                <img src="<?= e(newsImageUrl($news['featured_image'], $news['category_slug'] ?? null)) ?>" alt="<?= e($news['title']) ?>">
                             </a>
                             <div class="card-body p-0">
                                 <span class="story-cat"><?= e($news['category_name']) ?></span>
@@ -286,7 +286,7 @@ require_once __DIR__ . '/includes/navbar.php';
             <div class="col-lg-4 col-md-6">
                 <div class="card story-card h-100 shadow-sm border-0" style="background: var(--paper);">
                     <a href="<?= buildUrl('news.php', ['slug' => $item['slug']]) ?>" class="story-img-wrap" style="height: 200px; display: block; overflow: hidden;">
-                        <img src="<?= e(newsImageUrl($item['featured_image'])) ?>" alt="<?= e($item['title']) ?>" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+                        <img src="<?= e(newsImageUrl($item['featured_image'], $item['category_slug'] ?? null)) ?>" alt="<?= e($item['title']) ?>" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
                     </a>
                     <div class="card-body p-3 d-flex flex-column">
                         <span class="story-cat mb-1"><?= e($item['category_name']) ?></span>
@@ -324,7 +324,7 @@ require_once __DIR__ . '/includes/navbar.php';
             <div class="col-lg-4 col-md-6">
                 <div class="card story-card h-100 shadow-sm border-0" style="background: var(--paper);">
                     <a href="<?= buildUrl('news.php', ['slug' => $item['slug']]) ?>" class="story-img-wrap" style="height: 200px; display: block; overflow: hidden;">
-                        <img src="<?= e(newsImageUrl($item['featured_image'])) ?>" alt="<?= e($item['title']) ?>" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+                        <img src="<?= e(newsImageUrl($item['featured_image'], $item['category_slug'] ?? null)) ?>" alt="<?= e($item['title']) ?>" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
                     </a>
                     <div class="card-body p-3 d-flex flex-column">
                         <span class="story-cat mb-1"><?= e($item['category_name']) ?></span>
@@ -362,7 +362,7 @@ require_once __DIR__ . '/includes/navbar.php';
             <div class="col-lg-4 col-md-6">
                 <div class="card story-card h-100 shadow-sm border-0" style="background: var(--paper);">
                     <a href="<?= buildUrl('news.php', ['slug' => $item['slug']]) ?>" class="story-img-wrap" style="height: 200px; display: block; overflow: hidden;">
-                        <img src="<?= e(newsImageUrl($item['featured_image'])) ?>" alt="<?= e($item['title']) ?>" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+                        <img src="<?= e(newsImageUrl($item['featured_image'], $item['category_slug'] ?? null)) ?>" alt="<?= e($item['title']) ?>" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
                     </a>
                     <div class="card-body p-3 d-flex flex-column">
                         <span class="story-cat mb-1"><?= e($item['category_name']) ?></span>
@@ -400,7 +400,7 @@ require_once __DIR__ . '/includes/navbar.php';
             <div class="col-lg-4 col-md-6">
                 <div class="card story-card h-100 shadow-sm border-0" style="background: var(--paper);">
                     <a href="<?= buildUrl('news.php', ['slug' => $item['slug']]) ?>" class="story-img-wrap" style="height: 200px; display: block; overflow: hidden;">
-                        <img src="<?= e(newsImageUrl($item['featured_image'])) ?>" alt="<?= e($item['title']) ?>" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+                        <img src="<?= e(newsImageUrl($item['featured_image'], $item['category_slug'] ?? null)) ?>" alt="<?= e($item['title']) ?>" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
                     </a>
                     <div class="card-body p-3 d-flex flex-column">
                         <span class="story-cat mb-1"><?= e($item['category_name']) ?></span>
