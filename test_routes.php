@@ -22,7 +22,9 @@ $urls = [
     "http://localhost/SONI_PHP_WEBSITE/admin/categories/index.php",
     "http://localhost/SONI_PHP_WEBSITE/admin/users/index.php",
     "http://localhost/SONI_PHP_WEBSITE/admin/comments/index.php",
+    "http://localhost/SONI_PHP_WEBSITE/sitemap.php",
     "http://localhost/SONI_PHP_WEBSITE/admin/newsletter/index.php",
+    "http://localhost/SONI_PHP_WEBSITE/admin/newsletter/export.php",
     "http://localhost/SONI_PHP_WEBSITE/admin/messages/index.php"
 ];
 

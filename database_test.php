@@ -19,6 +19,15 @@
  * ============================================================
  */
 
+require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/auth.php';
+
+// Security Guard: Disable diagnostic script in production
+if (defined('APP_ENV') && APP_ENV === 'production') {
+    http_response_code(403);
+    die('<!DOCTYPE html><html><head><title>403 Forbidden</title></head><body><h1>403 Forbidden</h1><p>Development diagnostic tools are strictly disabled in production mode.</p></body></html>');
+}
+
 // --- Start output ---
 echo '<!DOCTYPE html>
 <html lang="en">

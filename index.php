@@ -42,7 +42,35 @@ $trendingNews = getNewsQuery($pdo, "1=1", "n.views DESC, n.published_at DESC", 5
 // 3. LATEST STORIES
 $latestNews = getNewsQuery($pdo, "n.id != " . (int)$heroId, "n.published_at DESC", 4);
 
-// 4. CATEGORIES (For Icon Grid)
+// Helper to fetch news by category slugs
+function getCategoryNews(PDO $pdo, array $slugs, int $limit = 3): array
+{
+    if (empty($slugs)) return [];
+    $placeholders = implode(',', array_fill(0, count($slugs), '?'));
+    $sql = "SELECT n.*, c.name as category_name, c.slug as category_slug, u.name as author_name 
+            FROM news n 
+            JOIN categories c ON n.category_id = c.id 
+            JOIN users u ON n.author_id = u.id 
+            WHERE n.status = 'published' AND c.slug IN ($placeholders)
+            ORDER BY n.published_at DESC 
+            LIMIT ?";
+    $stmt = $pdo->prepare($sql);
+    $idx = 1;
+    foreach ($slugs as $slug) {
+        $stmt->bindValue($idx++, $slug, PDO::PARAM_STR);
+    }
+    $stmt->bindValue($idx, $limit, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll();
+}
+
+// 4. Dedicated Editorial Category Sections
+$indiaGujaratNews = getCategoryNews($pdo, ['india', 'gujarat'], 3);
+$techAiNews       = getCategoryNews($pdo, ['technology', 'ai-ml'], 3);
+$bizEduNews       = getCategoryNews($pdo, ['business', 'education'], 3);
+$worldCultureNews = getCategoryNews($pdo, ['world', 'sports', 'entertainment'], 3);
+
+// 5. CATEGORIES (For Icon Grid)
 $categoriesWithNews = $pdo->query("SELECT name, slug FROM categories WHERE status = 'active' ORDER BY name ASC LIMIT 8")->fetchAll();
 
 // Handle newsletter subscription
@@ -243,6 +271,158 @@ require_once __DIR__ . '/includes/navbar.php';
 
         </div>
     </div>
+
+    <!-- ============ SECTION: INDIA & GUJARAT NEWS ============ -->
+    <?php if (!empty($indiaGujaratNews)): ?>
+    <section class="container py-4 border-top" style="border-color: var(--line) !important;">
+        <div class="section-header d-flex justify-content-between align-items-center mb-4">
+            <h3 class="section-title m-0" style="font-family: var(--font-display); font-size: 1.6rem;">
+                <span class="text-accent me-2">|</span>India &amp; Gujarat Focus
+            </h3>
+            <a href="<?= buildUrl('category.php', ['slug' => 'india']) ?>" class="view-all">More India News <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="row g-4">
+            <?php foreach ($indiaGujaratNews as $item): ?>
+            <div class="col-lg-4 col-md-6">
+                <div class="card story-card h-100 shadow-sm border-0" style="background: var(--paper);">
+                    <a href="<?= buildUrl('news.php', ['slug' => $item['slug']]) ?>" class="story-img-wrap" style="height: 200px; display: block; overflow: hidden;">
+                        <img src="<?= e(newsImageUrl($item['featured_image'])) ?>" alt="<?= e($item['title']) ?>" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+                    </a>
+                    <div class="card-body p-3 d-flex flex-column">
+                        <span class="story-cat mb-1"><?= e($item['category_name']) ?></span>
+                        <h4 class="story-title" style="font-size: 1.15rem; line-height: 1.35; margin-bottom: 8px;">
+                            <a href="<?= buildUrl('news.php', ['slug' => $item['slug']]) ?>">
+                                <?= e($item['title']) ?>
+                            </a>
+                        </h4>
+                        <p class="story-excerpt flex-grow-1" style="font-size: 0.9rem; color: var(--muted); margin-bottom: 12px;">
+                            <?= e(excerpt($item['short_description'] ?: $item['content'], 95)) ?>
+                        </p>
+                        <div class="story-meta mt-auto pt-2 border-top" style="border-color: var(--line) !important; font-size: 0.8rem; color: var(--muted);">
+                            <span><?= formatDate($item['published_at'], 'd M Y') ?></span>
+                            <span>&bull; <?= calculateReadingTime($item['content']) ?></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </section>
+    <?php endif; ?>
+
+    <!-- ============ SECTION: TECHNOLOGY & AI ============ -->
+    <?php if (!empty($techAiNews)): ?>
+    <section class="container py-4 border-top" style="border-color: var(--line) !important;">
+        <div class="section-header d-flex justify-content-between align-items-center mb-4">
+            <h3 class="section-title m-0" style="font-family: var(--font-display); font-size: 1.6rem;">
+                <span class="text-accent me-2">|</span>Technology &amp; Artificial Intelligence
+            </h3>
+            <a href="<?= buildUrl('category.php', ['slug' => 'technology']) ?>" class="view-all">More Tech News <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="row g-4">
+            <?php foreach ($techAiNews as $item): ?>
+            <div class="col-lg-4 col-md-6">
+                <div class="card story-card h-100 shadow-sm border-0" style="background: var(--paper);">
+                    <a href="<?= buildUrl('news.php', ['slug' => $item['slug']]) ?>" class="story-img-wrap" style="height: 200px; display: block; overflow: hidden;">
+                        <img src="<?= e(newsImageUrl($item['featured_image'])) ?>" alt="<?= e($item['title']) ?>" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+                    </a>
+                    <div class="card-body p-3 d-flex flex-column">
+                        <span class="story-cat mb-1"><?= e($item['category_name']) ?></span>
+                        <h4 class="story-title" style="font-size: 1.15rem; line-height: 1.35; margin-bottom: 8px;">
+                            <a href="<?= buildUrl('news.php', ['slug' => $item['slug']]) ?>">
+                                <?= e($item['title']) ?>
+                            </a>
+                        </h4>
+                        <p class="story-excerpt flex-grow-1" style="font-size: 0.9rem; color: var(--muted); margin-bottom: 12px;">
+                            <?= e(excerpt($item['short_description'] ?: $item['content'], 95)) ?>
+                        </p>
+                        <div class="story-meta mt-auto pt-2 border-top" style="border-color: var(--line) !important; font-size: 0.8rem; color: var(--muted);">
+                            <span><?= formatDate($item['published_at'], 'd M Y') ?></span>
+                            <span>&bull; <?= calculateReadingTime($item['content']) ?></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </section>
+    <?php endif; ?>
+
+    <!-- ============ SECTION: BUSINESS & EDUCATION ============ -->
+    <?php if (!empty($bizEduNews)): ?>
+    <section class="container py-4 border-top" style="border-color: var(--line) !important;">
+        <div class="section-header d-flex justify-content-between align-items-center mb-4">
+            <h3 class="section-title m-0" style="font-family: var(--font-display); font-size: 1.6rem;">
+                <span class="text-accent me-2">|</span>Business &amp; Education
+            </h3>
+            <a href="<?= buildUrl('category.php', ['slug' => 'business']) ?>" class="view-all">More Business News <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="row g-4">
+            <?php foreach ($bizEduNews as $item): ?>
+            <div class="col-lg-4 col-md-6">
+                <div class="card story-card h-100 shadow-sm border-0" style="background: var(--paper);">
+                    <a href="<?= buildUrl('news.php', ['slug' => $item['slug']]) ?>" class="story-img-wrap" style="height: 200px; display: block; overflow: hidden;">
+                        <img src="<?= e(newsImageUrl($item['featured_image'])) ?>" alt="<?= e($item['title']) ?>" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+                    </a>
+                    <div class="card-body p-3 d-flex flex-column">
+                        <span class="story-cat mb-1"><?= e($item['category_name']) ?></span>
+                        <h4 class="story-title" style="font-size: 1.15rem; line-height: 1.35; margin-bottom: 8px;">
+                            <a href="<?= buildUrl('news.php', ['slug' => $item['slug']]) ?>">
+                                <?= e($item['title']) ?>
+                            </a>
+                        </h4>
+                        <p class="story-excerpt flex-grow-1" style="font-size: 0.9rem; color: var(--muted); margin-bottom: 12px;">
+                            <?= e(excerpt($item['short_description'] ?: $item['content'], 95)) ?>
+                        </p>
+                        <div class="story-meta mt-auto pt-2 border-top" style="border-color: var(--line) !important; font-size: 0.8rem; color: var(--muted);">
+                            <span><?= formatDate($item['published_at'], 'd M Y') ?></span>
+                            <span>&bull; <?= calculateReadingTime($item['content']) ?></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </section>
+    <?php endif; ?>
+
+    <!-- ============ SECTION: WORLD, SPORTS & CULTURE ============ -->
+    <?php if (!empty($worldCultureNews)): ?>
+    <section class="container py-4 border-top" style="border-color: var(--line) !important;">
+        <div class="section-header d-flex justify-content-between align-items-center mb-4">
+            <h3 class="section-title m-0" style="font-family: var(--font-display); font-size: 1.6rem;">
+                <span class="text-accent me-2">|</span>World &amp; Culture
+            </h3>
+            <a href="<?= buildUrl('category.php', ['slug' => 'world']) ?>" class="view-all">More World News <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="row g-4">
+            <?php foreach ($worldCultureNews as $item): ?>
+            <div class="col-lg-4 col-md-6">
+                <div class="card story-card h-100 shadow-sm border-0" style="background: var(--paper);">
+                    <a href="<?= buildUrl('news.php', ['slug' => $item['slug']]) ?>" class="story-img-wrap" style="height: 200px; display: block; overflow: hidden;">
+                        <img src="<?= e(newsImageUrl($item['featured_image'])) ?>" alt="<?= e($item['title']) ?>" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+                    </a>
+                    <div class="card-body p-3 d-flex flex-column">
+                        <span class="story-cat mb-1"><?= e($item['category_name']) ?></span>
+                        <h4 class="story-title" style="font-size: 1.15rem; line-height: 1.35; margin-bottom: 8px;">
+                            <a href="<?= buildUrl('news.php', ['slug' => $item['slug']]) ?>">
+                                <?= e($item['title']) ?>
+                            </a>
+                        </h4>
+                        <p class="story-excerpt flex-grow-1" style="font-size: 0.9rem; color: var(--muted); margin-bottom: 12px;">
+                            <?= e(excerpt($item['short_description'] ?: $item['content'], 95)) ?>
+                        </p>
+                        <div class="story-meta mt-auto pt-2 border-top" style="border-color: var(--line) !important; font-size: 0.8rem; color: var(--muted);">
+                            <span><?= formatDate($item['published_at'], 'd M Y') ?></span>
+                            <span>&bull; <?= calculateReadingTime($item['content']) ?></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </section>
+    <?php endif; ?>
 
     <!-- ============ CATEGORY ICONS ============ -->
     <?php if (!empty($categoriesWithNews)): ?>

@@ -13,8 +13,8 @@ try {
     $stmt = $pdo->query("SELECT name, slug FROM categories WHERE status = 'active' ORDER BY name ASC");
     $navCategories = $stmt->fetchAll();
     
-    // Fetch breaking news (latest 3 published articles)
-    $breakStmt = $pdo->query("SELECT title, slug FROM news WHERE status = 'published' ORDER BY published_at DESC LIMIT 3");
+    // Fetch breaking news (strictly published stories marked as breaking)
+    $breakStmt = $pdo->query("SELECT title, slug FROM news WHERE status = 'published' AND is_breaking = 1 ORDER BY published_at DESC LIMIT 5");
     $breakingNews = $breakStmt->fetchAll();
 } catch (Exception $e) {
     $navCategories = [];
@@ -134,20 +134,20 @@ $currentScript = basename($_SERVER['SCRIPT_NAME'] ?? '');
 
 <!-- ============ BREAKING NEWS BAR ============ -->
 <?php if (!empty($breakingNews)): ?>
-<div class="breaking-bar">
+<div class="breaking-bar" role="region" aria-label="Breaking News">
     <div class="container">
         <span class="breaking-label">
-            <i class="fas fa-bolt"></i> BREAKING
+            <i class="fas fa-bolt" aria-hidden="true"></i> BREAKING
         </span>
-        <div class="breaking-text" id="breakingText">
+        <div class="breaking-text" id="breakingText" aria-live="polite">
             <a href="<?= buildUrl('news.php', ['slug' => $breakingNews[0]['slug']]) ?>">
                 <?= e($breakingNews[0]['title']) ?>
             </a>
         </div>
         <?php if (count($breakingNews) > 1): ?>
         <div class="breaking-nav">
-            <button type="button" id="breakingPrev" aria-label="Previous"><i class="fas fa-chevron-left"></i></button>
-            <button type="button" id="breakingNext" aria-label="Next"><i class="fas fa-chevron-right"></i></button>
+            <button type="button" id="breakingPrev" aria-label="Previous breaking story"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
+            <button type="button" id="breakingNext" aria-label="Next breaking story"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
         </div>
         <?php endif; ?>
     </div>
@@ -159,6 +159,7 @@ $currentScript = basename($_SERVER['SCRIPT_NAME'] ?? '');
     }, $breakingNews)) ?>;
     if (items.length <= 1) return;
     var idx = 0;
+    var isPaused = false;
     var el = document.getElementById('breakingText');
     var base = '<?= url('news.php') ?>';
     function show(i) {
@@ -169,7 +170,18 @@ $currentScript = basename($_SERVER['SCRIPT_NAME'] ?? '');
     var next = document.getElementById('breakingNext');
     if (prev) prev.addEventListener('click', function() { show(idx - 1); });
     if (next) next.addEventListener('click', function() { show(idx + 1); });
-    setInterval(function() { show(idx + 1); }, 5000);
+    
+    // Pause cycling on hover or focus
+    el.addEventListener('mouseenter', function() { isPaused = true; });
+    el.addEventListener('mouseleave', function() { isPaused = false; });
+    el.addEventListener('focusin', function() { isPaused = true; });
+    el.addEventListener('focusout', function() { isPaused = false; });
+    
+    setInterval(function() {
+        if (!isPaused) {
+            show(idx + 1);
+        }
+    }, 5500);
 })();
 </script>
 <?php endif; ?>

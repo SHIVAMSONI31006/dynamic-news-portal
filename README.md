@@ -91,65 +91,83 @@ Follow these steps to deploy the project locally using XAMPP:
 7. Configure the database connection if necessary by editing `config/database.php` (it defaults to `root` with no password).
 8. Open the local project URL (e.g., `http://localhost/SONI_PHP_WEBSITE`) in your browser.
 
-## Admin Access
-Admin credentials are created initially during setup or via the database seeder. You can login using the designated admin email and password at the `/admin/login.php` route. 
-*Note: Change the default development password through the Admin Users panel before any public demonstration or submission.*
+## Demonstration Accounts
+When importing `database/news_portal.sql`, the following pre-seeded test accounts are available:
+* **Administrator:** `admin@newsportal.local` / `NewsPortal@2026`
+* **Editor:** `editor@newsportal.local` / `Editor@2026`
+* **Reader:** `user@newsportal.local` / `User@2026`
 
-## Security Implementations
-The following mechanisms secure the application against common web vulnerabilities:
-* **PDO Prepared Statements**: Parametrized queries are enforced globally to prevent SQL injection.
-* **Password Hashing**: `password_hash()` and `password_verify()` utilizing Bcrypt safeguard user credentials.
-* **CSRF Protection**: All state-changing POST requests require a cryptographically secure token (`random_bytes`).
-* **XSS Escaping**: Output variables are rendered via a centralized escaping helper (`htmlspecialchars`). Untrusted HTML (like comments) is sanitized with `strip_tags()`.
-* **Role-Based Authorization**: A centralized guard blocks direct URL traversal depending on the active user session ID and role array.
-* **Session Protection**: Implements `session_regenerate_id()` during authentication alongside HTTP-only cookies.
-* **Upload Validation**: Image uploads verify authentic MIME types (`finfo_file`), implement random string filenames, restrict extensions, and are protected by a `.htaccess` file prohibiting backend PHP script execution in the directory.
-* **Security Headers**: Injecting headers (`X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`) dynamically on response boundaries.
-* **Safe Error Handling**: Exceptions are caught to hide DB internal schemas from the end user viewport.
+*Security Note: Change default passwords through the Admin Users panel before any public demonstration.*
+
+## Automated Test Execution
+Run the complete automated test suite (38 verification checks covering database connectivity, Bcrypt verification, CSRF, XSS escaping, SQL injection isolation, transactional CRUD, and live HTTP routes):
+```bash
+php -f run_tests.php
+```
+
+## Security & Architectural Reports
+Detailed documentation and quality assurance audits are available in the project root:
+* [PROJECT_AUDIT_REPORT.md](file:///c:/Users/dixit/OneDrive/Desktop/COLLEGE_PROJECT/SONI_PHP_WEBSITE/PROJECT_AUDIT_REPORT.md) — Comprehensive code and route audit.
+* [UI_UX_IMPROVEMENTS.md](file:///c:/Users/dixit/OneDrive/Desktop/COLLEGE_PROJECT/SONI_PHP_WEBSITE/UI_UX_IMPROVEMENTS.md) — Editorial UI/UX transformation & viewport tests.
+* [DATABASE_AND_SECURITY_AUDIT.md](file:///c:/Users/dixit/OneDrive/Desktop/COLLEGE_PROJECT/SONI_PHP_WEBSITE/DATABASE_AND_SECURITY_AUDIT.md) — Schema integrity, PDO binding, and security controls.
+* [PRODUCTION_DEPLOYMENT_REPORT.md](file:///c:/Users/dixit/OneDrive/Desktop/COLLEGE_PROJECT/SONI_PHP_WEBSITE/PRODUCTION_DEPLOYMENT_REPORT.md) — Deployment instructions, persistent storage, and .env configuration.
+* [TEST_RESULTS.md](file:///c:/Users/dixit/OneDrive/Desktop/COLLEGE_PROJECT/SONI_PHP_WEBSITE/TEST_RESULTS.md) — Automated & manual test pass logs (38/38 PASS).
+* [VIVA_NOTES.md](file:///c:/Users/dixit/OneDrive/Desktop/COLLEGE_PROJECT/SONI_PHP_WEBSITE/VIVA_NOTES.md) — 30 viva questions and concise answers for college defense.
 
 ## Project Structure
 ```text
 Dynamic News Portal/
 │
 ├── admin/                 # Restricted dashboard panel
-│   ├── categories/        
-│   ├── comments/          
-│   ├── includes/          
-│   ├── messages/          
-│   ├── newsletter/        
-│   ├── news/              
-│   ├── users/             
-│   ├── index.php          
-│   ├── login.php          
-│   └── logout.php         
+│   ├── categories/        # Category management (CRUD)
+│   ├── comments/          # Comment moderation queue
+│   ├── includes/          # Admin headers, sidebars, footers
+│   ├── messages/          # Contact inquiries viewer
+│   ├── newsletter/        # Newsletter subscribers & CSV export
+│   ├── news/              # News article management & image upload
+│   ├── users/             # User management & role assignment
+│   ├── index.php          # Admin metrics dashboard
+│   ├── login.php          # Admin login controller
+│   └── logout.php         # Admin logout
 │
 ├── assets/                # Static frontend assets
-│   ├── css/               
-│   ├── js/                
-│   └── images/            
+│   ├── css/               # Bootstrap 5 & editorial styles (style.css)
+│   ├── js/                # Scripts & Bootstrap bundle
+│   └── images/            # Default fallback images & logos
 │
-├── config/                # Environment config
-│   └── database.php       
+├── config/                # Environment configuration
+│   └── database.php       # Centralized PDO connection & .env loader
 │
 ├── database/              # Schema and test structures
+│   └── news_portal.sql    # Complete MySQL schema & seed data
 │
 ├── errors/                # Global generic error pages (403, 404)
 │
-├── includes/              # Shared controllers, auth, headers/footers
+├── includes/              # Shared utilities, auth guards, headers/footers
+│   ├── auth.php           # RBAC authorization middleware
+│   ├── csrf.php           # CSRF token generator & validator
+│   ├── functions.php      # Reusable helpers & output escaper
+│   ├── header.php         # HTML document head & Open Graph tags
+│   ├── navbar.php         # Masthead, navigation & breaking ticker
+│   └── footer.php         # Public footer & navigation links
 │
 ├── uploads/               # Dynamic binary storage
-│   └── news/              
+│   └── news/              # Uploaded images (protected by .htaccess)
 │
+├── .env.example           # Production environment configuration template
+├── robots.txt             # Search crawler directives
+├── sitemap.php            # Dynamic XML sitemap generator
 ├── index.php              # Public homepage
-├── news.php               # Article read page
-├── category.php           
-├── search.php             
-├── about.php              
-├── contact.php            
-├── login.php              
-├── register.php           
-├── logout.php             
-├── profile.php            
-├── VIVA_NOTES.md          # College viva defense prep
+├── news.php               # Article read page with comments & likes
+├── category.php           # Category archive with pagination
+├── search.php             # Search engine & sorting controller
+├── about.php              # About page
+├── contact.php            # Contact form
+├── login.php              # User login
+├── register.php           # User registration
+├── logout.php             # User logout
+├── profile.php            # User profile management
+├── run_tests.php          # Automated test suite (38 checks)
+├── VIVA_NOTES.md          # College viva defense prep (30 Q&As)
 └── README.md              # Project documentation
 ```

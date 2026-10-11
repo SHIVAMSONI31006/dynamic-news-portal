@@ -97,13 +97,24 @@ require_once __DIR__ . '/includes/navbar.php';
 $allowedTags = '<p><br><strong><em><b><i><h2><h3><h4><ul><ol><li><blockquote><a>';
 $safeContent = strip_tags($article['content'], $allowedTags);
 
-$currentUrl = urlencode((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
+$rawUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+$currentUrl = $rawUrl; // Clean URL for canonical and copy
+$shareUrl = urlencode($rawUrl);
 $encodedTitle = urlencode($article['title']);
 ?>
 
 <main class="py-5" style="background-color: var(--white);">
     <!-- Article Header Area (Centered, wide) -->
     <div class="container">
+        <!-- Breadcrumbs -->
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb" style="font-size: 0.85rem;">
+                <li class="breadcrumb-item"><a href="<?= url('index.php') ?>" class="text-muted">Home</a></li>
+                <li class="breadcrumb-item"><a href="<?= buildUrl('category.php', ['slug' => $article['category_slug']]) ?>" class="text-muted"><?= e($article['category_name']) ?></a></li>
+                <li class="breadcrumb-item active text-truncate" style="max-width: 300px;" aria-current="page"><?= e($article['title']) ?></li>
+            </ol>
+        </nav>
+
         <div class="article-header">
             <a href="<?= buildUrl('category.php', ['slug' => $article['category_slug']]) ?>" class="category-badge mb-4">
                 <?= e($article['category_name']) ?>
@@ -130,7 +141,7 @@ $encodedTitle = urlencode($article['title']);
 
     <!-- Featured Image -->
     <div class="container-fluid px-0 px-md-4">
-        <img src="<?= e(newsImageUrl($article['featured_image'])) ?>" alt="<?= e($article['title']) ?>" class="article-featured-image shadow-sm">
+        <img src="<?= e(newsImageUrl($article['featured_image'])) ?>" alt="<?= e($article['title']) ?>" class="article-featured-image shadow-sm" loading="lazy">
     </div>
 
     <div class="container">
@@ -151,14 +162,14 @@ $encodedTitle = urlencode($article['title']);
                                     <input type="hidden" name="news_id" value="<?= $article['id'] ?>">
                                     <input type="hidden" name="slug" value="<?= e($article['slug']) ?>">
                                     <button type="submit" class="btn-action <?= $userLiked ? 'active' : '' ?>">
-                                        <i class="<?= $userLiked ? 'fas' : 'far' ?> fa-heart me-2"></i> 
+                                        <i class="<?= $userLiked ? 'fas' : 'far' ?> fa-heart me-2" aria-hidden="true"></i> 
                                         <?= $userLiked ? 'Liked' : 'Like' ?> 
                                         <span class="ms-2" style="font-weight: 800; border-left: 1px solid currentColor; padding-left: 10px;"><?= number_format($likeCount) ?></span>
                                     </button>
                                 </form>
                             <?php else: ?>
                                 <button class="btn-action text-muted" title="Log in to like" disabled style="opacity: 0.6;">
-                                    <i class="far fa-heart me-2"></i> Like 
+                                    <i class="far fa-heart me-2" aria-hidden="true"></i> Like 
                                     <span class="ms-2" style="font-weight: 800; border-left: 1px solid currentColor; padding-left: 10px;"><?= number_format($likeCount) ?></span>
                                 </button>
                             <?php endif; ?>
@@ -166,17 +177,17 @@ $encodedTitle = urlencode($article['title']);
 
                         <!-- Share Buttons -->
                         <div class="d-flex gap-2">
-                            <a href="https://api.whatsapp.com/send?text=<?= $encodedTitle ?>%20<?= $currentUrl ?>" target="_blank" class="btn-action" title="WhatsApp">
-                                <i class="fab fa-whatsapp"></i>
+                            <a href="https://api.whatsapp.com/send?text=<?= $encodedTitle ?>%20<?= $shareUrl ?>" target="_blank" rel="noopener noreferrer" class="btn-action" title="Share on WhatsApp">
+                                <i class="fab fa-whatsapp" aria-hidden="true"></i>
                             </a>
-                            <a href="https://www.facebook.com/sharer/sharer.php?u=<?= $currentUrl ?>" target="_blank" class="btn-action" title="Facebook">
-                                <i class="fab fa-facebook-f"></i>
+                            <a href="https://www.facebook.com/sharer/sharer.php?u=<?= $shareUrl ?>" target="_blank" rel="noopener noreferrer" class="btn-action" title="Share on Facebook">
+                                <i class="fab fa-facebook-f" aria-hidden="true"></i>
                             </a>
-                            <a href="https://twitter.com/intent/tweet?url=<?= $currentUrl ?>&text=<?= $encodedTitle ?>" target="_blank" class="btn-action" title="X">
-                                <i class="fab fa-x-twitter"></i>
+                            <a href="https://twitter.com/intent/tweet?url=<?= $shareUrl ?>&text=<?= $encodedTitle ?>" target="_blank" rel="noopener noreferrer" class="btn-action" title="Share on X">
+                                <i class="fab fa-x-twitter" aria-hidden="true"></i>
                             </a>
-                            <button type="button" class="btn-action" onclick="navigator.clipboard.writeText('<?= urldecode($currentUrl) ?>').then(()=>alert('Link copied!'))" title="Copy Link">
-                                <i class="far fa-copy"></i>
+                            <button type="button" class="btn-action" onclick="navigator.clipboard.writeText('<?= addslashes($rawUrl) ?>').then(()=>alert('Article link copied to clipboard!'))" title="Copy Link">
+                                <i class="far fa-copy" aria-hidden="true"></i>
                             </button>
                         </div>
                     </div>

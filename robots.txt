@@ -1,0 +1,21 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /config/
+Disallow: /database/
+Disallow: /includes/
+Disallow: /errors/
+Disallow: /profile.php
+Disallow: /database_test.php
+Disallow: /test_routes.php
+
+Allow: /
+Allow: /index.php
+Allow: /news.php
+Allow: /category.php
+Allow: /search.php
+Allow: /about.php
+Allow: /contact.php
+Allow: /assets/
+Allow: /uploads/
+
+Sitemap: sitemap.php

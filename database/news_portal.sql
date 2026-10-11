@@ -223,17 +223,17 @@ CREATE TABLE IF NOT EXISTS `newsletter_subscribers` (
 
 INSERT INTO `users` (`name`, `email`, `password`, `role`, `status`) VALUES
 ('Admin User', 'admin@newsportal.local',
- '$2y$10$owtMcYFVlxhSrOyAKXSp8Oo6Ebg0AxwanqoeTNYKLqO9LM92yUa7a',
+ '$2y$10$f4C5hsl0xOJWFmRg4oPrwOZmyp7zhlUWLMY8pluM0m4aWz1Ld7iqa',
  'admin', 'active');
 
 INSERT INTO `users` (`name`, `email`, `password`, `role`, `status`) VALUES
 ('Editor User', 'editor@newsportal.local',
- '$2y$10$aqk6ToCbhh6.hDEUOO8wr.gMEGjmEU1vwY8IX2E5Y.pIFB7EmhBxC',
+ '$2y$10$FLS.SpRP/P42oDsYyrqgx.haByjV7bkuefK8YIZsU1jMMET8KiHFm',
  'editor', 'active');
 
 INSERT INTO `users` (`name`, `email`, `password`, `role`, `status`) VALUES
 ('Dixit Soni', 'user@newsportal.local',
- '$2y$10$PdjV5ljpKDXz61lZIDSsJ.4vWqWF6pATEE7TneW5h1KPWFIQRnfJq',
+ '$2y$10$AOk/E3jarZ35VAhLzoQxI.h79Fc4kaHd5BwYJiNIyn6dXmzMrCKHK',
  'user', 'active');
 
 

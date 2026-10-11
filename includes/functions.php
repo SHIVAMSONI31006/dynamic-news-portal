@@ -52,14 +52,19 @@ function e($value): string
  */
 function url(string $path = ''): string
 {
-    $clientUrl = 'http://localhost:8000';
-    $backendUrl = 'http://localhost:9000';
-    
     $path = ltrim($path, '/');
     $isAdminPath = str_starts_with($path, 'admin/') || $path === 'admin';
     if ($isAdminPath) {
         $path = preg_replace('#^admin/?#', '', $path);
     }
+    
+    // Check if APP_URL is defined from environment configuration
+    if (defined('APP_URL') && APP_URL !== '') {
+        return rtrim(APP_URL, '/') . '/' . ($isAdminPath ? 'admin/' . $path : $path);
+    }
+    
+    $clientUrl = 'http://localhost:8000';
+    $backendUrl = 'http://localhost:9000';
     
     $port = $_SERVER['SERVER_PORT'] ?? '';
     if ($port == '8000' || $port == '9000') {
