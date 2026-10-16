@@ -2,15 +2,18 @@ FROM php:8.3-apache
 
 # Install required system packages and PHP extensions
 RUN apt-get update && apt-get install -y \
+    ca-certificates \
     libpng-dev \
     libjpeg-dev \
     libwebp-dev \
     libfreetype6-dev \
     libonig-dev \
+    && update-ca-certificates \
     && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
     && docker-php-ext-install -j$(nproc) gd pdo pdo_mysql mbstring \
     && a2enmod rewrite headers \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
 
 # Set Apache working directory
 WORKDIR /var/www/html

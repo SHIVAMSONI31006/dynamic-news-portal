@@ -93,6 +93,23 @@ function connectDB(): PDO
 
         // Support SSL/TLS for cloud database connections (e.g., TiDB Serverless, Aiven, Azure MySQL)
         if (defined('DB_SSL') && DB_SSL === true) {
+            $caBundles = [
+                '/etc/ssl/certs/ca-certificates.crt', // Debian / Ubuntu / Docker
+                '/etc/pki/tls/certs/ca-bundle.crt',   // RedHat / CentOS
+                '/etc/ssl/cert.pem',                  // Alpine / macOS
+            ];
+            $caPath = null;
+            foreach ($caBundles as $bundle) {
+                if (file_exists($bundle)) {
+                    $caPath = $bundle;
+                    break;
+                }
+            }
+            if ($caPath !== null) {
+                $options[PDO::MYSQL_ATTR_SSL_CA] = $caPath;
+            } else {
+                $options[PDO::MYSQL_ATTR_SSL_CA] = true;
+            }
             $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
         }
 
