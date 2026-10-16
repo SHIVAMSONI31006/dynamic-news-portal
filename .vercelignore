@@ -1,0 +1,15 @@
+.git
+.env
+.dual_servers.json
+start-both.*
+start-dual-servers.*
+stop-both.*
+stop-dual-servers.*
+run_tests.php
+test_routes.php
+database_test.php
+*.md
+Dockerfile
+.dockerignore
+logs/
+scratch/
