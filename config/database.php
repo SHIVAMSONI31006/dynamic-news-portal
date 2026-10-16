@@ -57,7 +57,10 @@ if (!defined('DB_NAME'))   define('DB_NAME', env('DB_NAME', 'news_portal'));
 if (!defined('DB_USER'))   define('DB_USER', env('DB_USER', 'root'));
 if (!defined('DB_PASS'))   define('DB_PASS', env('DB_PASS', '')); // Default XAMPP has no password
 if (!defined('DB_CHARSET'))define('DB_CHARSET', env('DB_CHARSET', 'utf8mb4'));
-if (!defined('DB_SSL'))    define('DB_SSL', filter_var(env('DB_SSL', false), FILTER_VALIDATE_BOOLEAN));
+
+// Auto-detect cloud SSL requirement (e.g., TiDB Cloud Serverless or DB_PORT=4000)
+$isCloudSsl = (str_contains((string)DB_HOST, 'tidbcloud.com') || (string)DB_PORT === '4000');
+if (!defined('DB_SSL'))    define('DB_SSL', filter_var(env('DB_SSL', $isCloudSsl), FILTER_VALIDATE_BOOLEAN));
 
 /**
  * Returns a PDO database connection instance.

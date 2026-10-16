@@ -1,4 +1,4 @@
-﻿-- ============================================================
+-- ============================================================
 -- NEWS PORTAL — Production Database Schema & Seed Data
 -- ============================================================
 -- Importable into ANY hosted MySQL / MariaDB database (e.g. TiDB,
@@ -6,7 +6,10 @@
 -- Does NOT execute CREATE DATABASE or USE statements.
 -- ============================================================
 
+USE test;
+
 -- ============================================================
+
 -- TABLE 1: users
 -- ============================================================
 -- Stores all users â€” admins, editors, and public users.
