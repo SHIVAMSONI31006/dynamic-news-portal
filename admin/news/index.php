@@ -2,9 +2,10 @@
 $pageTitle = 'News Management';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../includes/functions.php';
-require_once __DIR__ . '/../includes/header.php';
+require_once __DIR__ . '/../../includes/auth.php';
 
 // Editor and Admin have access
+requireAdmin();
 
 $pdo = connectDB();
 
@@ -75,24 +76,34 @@ try {
     $categories = [];
     $totalPages = 0;
 }
+
+require_once __DIR__ . '/../includes/header.php';
 ?>
 
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
-    <h1 class="h3 mb-0 text-gray-800">News Management</h1>
-    <a href="create.php" class="btn btn-primary"><i class="fas fa-plus me-2"></i>Create News</a>
+    <div>
+        <h2 class="h4 mb-1 text-dark fw-bold">Editorial Articles</h2>
+        <p class="text-muted small mb-0">Publish, schedule, edit, and organize all news publications.</p>
+    </div>
+    <a href="create.php" class="btn btn-danger btn-sm px-3 shadow-sm">
+        <i class="fas fa-feather-pointed me-2"></i> Compose Article
+    </a>
 </div>
 
 <!-- Filters -->
-<div class="card shadow-sm border-0 mb-4">
-    <div class="card-body">
+<div class="admin-card mb-4">
+    <div class="admin-card-body p-3">
         <form method="GET" action="index.php" class="row g-3 align-items-end">
             <div class="col-md-4">
-                <label class="form-label fw-bold">Search Title</label>
-                <input type="text" name="q" class="form-control" value="<?= e($q) ?>" placeholder="Keywords...">
+                <label class="form-label small fw-semibold text-dark mb-1">Search Keywords</label>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-light text-muted"><i class="fas fa-magnifying-glass"></i></span>
+                    <input type="text" name="q" class="form-control" value="<?= e($q) ?>" placeholder="Title or summary...">
+                </div>
             </div>
             <div class="col-md-3">
-                <label class="form-label fw-bold">Status</label>
-                <select name="status" class="form-select">
+                <label class="form-label small fw-semibold text-dark mb-1">Publication Status</label>
+                <select name="status" class="form-select form-select-sm">
                     <option value="">All Statuses</option>
                     <option value="published" <?= $status === 'published' ? 'selected' : '' ?>>Published</option>
                     <option value="draft" <?= $status === 'draft' ? 'selected' : '' ?>>Draft</option>
@@ -100,125 +111,137 @@ try {
                 </select>
             </div>
             <div class="col-md-3">
-                <label class="form-label fw-bold">Category</label>
-                <select name="category" class="form-select">
+                <label class="form-label small fw-semibold text-dark mb-1">Category</label>
+                <select name="category" class="form-select form-select-sm">
                     <option value="">All Categories</option>
                     <?php foreach ($categories as $cat): ?>
                         <option value="<?= $cat['id'] ?>" <?= $category == $cat['id'] ? 'selected' : '' ?>><?= e($cat['name']) ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-secondary w-100"><i class="fas fa-filter me-2"></i>Filter</button>
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary btn-sm flex-grow-1"><i class="fas fa-filter me-1"></i> Filter</button>
+                <?php if ($q !== '' || $status !== '' || $category !== ''): ?>
+                    <a href="index.php" class="btn btn-outline-secondary btn-sm" title="Clear Filters"><i class="fas fa-xmark"></i></a>
+                <?php endif; ?>
             </div>
         </form>
     </div>
 </div>
 
 <!-- News Table -->
-<div class="card shadow-sm border-0">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
+<div class="admin-card">
+    <div class="table-responsive">
+        <table class="table table-admin align-middle mb-0">
+            <thead>
+                <tr>
+                    <th class="px-3" style="width: 70px;">Media</th>
+                    <th style="min-width: 250px;">Article Title & Author</th>
+                    <th>Status & Flags</th>
+                    <th>Readership</th>
+                    <th>Timeline</th>
+                    <th class="text-end px-3">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (empty($newsList)): ?>
+                <tr>
+                    <td colspan="6" class="text-center py-5">
+                        <div class="admin-empty-state">
+                            <div class="admin-empty-icon"><i class="fas fa-newspaper"></i></div>
+                            <div class="admin-empty-title">No articles found</div>
+                            <div class="admin-empty-desc">No publications match your filter criteria or search keyword.</div>
+                            <a href="create.php" class="btn btn-danger btn-sm mt-2">Create New Article</a>
+                        </div>
+                    </td>
+                </tr>
+                <?php else: ?>
+                    <?php foreach ($newsList as $news): ?>
                     <tr>
-                        <th class="px-3" style="width: 60px;">Image</th>
-                        <th>Title / Details</th>
-                        <th>Status / Flags</th>
-                        <th>Views</th>
-                        <th>Date</th>
-                        <th class="text-end px-3">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (empty($newsList)): ?>
-                    <tr>
-                        <td colspan="6" class="text-center py-5 text-muted">
-                            <i class="fas fa-newspaper fa-3x mb-3 text-light"></i>
-                            <p>No news articles found matching your criteria.</p>
+                        <td class="px-3">
+                            <?php if ($news['featured_image']): ?>
+                                <img src="<?= buildUrl($news['featured_image']) ?>" alt="" class="rounded border" style="width: 48px; height: 36px; object-fit: cover;" onerror="this.style.display='none'">
+                            <?php else: ?>
+                                <div class="bg-light text-center text-muted border rounded d-flex align-items-center justify-content-center" style="width: 48px; height: 36px;">
+                                    <i class="fas fa-image small"></i>
+                                </div>
+                            <?php endif; ?>
                         </td>
-                    </tr>
-                    <?php else: ?>
-                        <?php foreach ($newsList as $news): ?>
-                        <tr>
-                            <td class="px-3">
-                                <?php if ($news['featured_image']): ?>
-                                    <img src="<?= buildUrl($news['featured_image']) ?>" alt="Thumbnail" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">
-                                <?php else: ?>
-                                    <div class="bg-light text-center text-muted border rounded d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-                                        <i class="fas fa-image"></i>
-                                    </div>
-                                <?php endif; ?>
-                            </td>
-                            <td>
-                                <div class="fw-bold mb-1" style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="<?= e($news['title']) ?>">
+                        <td>
+                            <div class="fw-semibold mb-1 text-truncate" style="max-width: 280px;" title="<?= e($news['title']) ?>">
+                                <a href="edit.php?id=<?= $news['id'] ?>" class="text-dark text-decoration-none">
                                     <?= e($news['title']) ?>
-                                </div>
-                                <div class="small">
-                                    <span class="badge bg-secondary me-1"><?= e($news['category_name']) ?></span>
-                                    <span class="text-muted"><i class="fas fa-user ms-2 me-1"></i><?= e($news['author_name']) ?></span>
-                                </div>
-                            </td>
-                            <td>
+                                </a>
+                            </div>
+                            <div class="small d-flex align-items-center gap-2">
+                                <span class="badge bg-light text-dark border"><?= e($news['category_name']) ?></span>
+                                <span class="text-muted"><i class="fas fa-user-pen me-1"></i><?= e($news['author_name']) ?></span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="mb-1">
                                 <?php if ($news['status'] === 'published'): ?>
-                                    <span class="badge bg-success mb-1">Published</span>
+                                    <span class="badge-status-published"><i class="fas fa-circle" style="font-size: 6px;"></i> Published</span>
                                 <?php elseif ($news['status'] === 'archived'): ?>
-                                    <span class="badge bg-secondary mb-1">Archived</span>
+                                    <span class="badge-status-archived"><i class="fas fa-circle" style="font-size: 6px;"></i> Archived</span>
                                 <?php else: ?>
-                                    <span class="badge bg-warning text-dark mb-1">Draft</span>
+                                    <span class="badge-status-draft"><i class="fas fa-circle" style="font-size: 6px;"></i> Draft</span>
                                 <?php endif; ?>
-                                
-                                <br>
+                            </div>
+                            <div>
                                 <?php if ($news['is_featured']): ?>
-                                    <span class="badge bg-primary" title="Featured"><i class="fas fa-star"></i></span>
+                                    <span class="badge bg-primary text-white" style="font-size: 0.65rem;" title="Featured on Homepage"><i class="fas fa-star me-1"></i>Featured</span>
                                 <?php endif; ?>
                                 <?php if ($news['is_breaking']): ?>
-                                    <span class="badge bg-danger" title="Breaking"><i class="fas fa-bolt"></i></span>
+                                    <span class="badge bg-danger text-white" style="font-size: 0.65rem;" title="Breaking News Alert"><i class="fas fa-bolt me-1"></i>Breaking</span>
                                 <?php endif; ?>
-                            </td>
-                            <td><?= number_format($news['views']) ?></td>
-                            <td class="small text-muted">
-                                <div><i class="fas fa-calendar-alt me-1"></i> <?= date('M j, Y', strtotime($news['created_at'])) ?></div>
-                                <?php if ($news['published_at']): ?>
-                                    <div class="text-success"><i class="fas fa-paper-plane me-1"></i> <?= date('M j, Y', strtotime($news['published_at'])) ?></div>
-                                <?php endif; ?>
-                            </td>
-                            <td class="text-end px-3">
+                            </div>
+                        </td>
+                        <td>
+                            <span class="fw-semibold text-dark"><i class="fas fa-eye text-muted me-1 small"></i><?= number_format($news['views']) ?></span>
+                        </td>
+                        <td class="small text-muted">
+                            <div><i class="fas fa-calendar-plus me-1 text-muted"></i> <?= date('M j, Y', strtotime($news['created_at'])) ?></div>
+                            <?php if ($news['published_at']): ?>
+                                <div class="text-success small"><i class="fas fa-paper-plane me-1"></i> <?= date('M j, Y', strtotime($news['published_at'])) ?></div>
+                            <?php endif; ?>
+                        </td>
+                        <td class="text-end px-3">
+                            <div class="d-inline-flex gap-1 align-items-center">
                                 <!-- Status Toggle Form -->
-                                <form method="POST" action="toggle-status.php" class="d-inline">
+                                <form method="POST" action="toggle-status.php" class="d-inline m-0">
                                     <?= csrfField() ?>
                                     <input type="hidden" name="id" value="<?= $news['id'] ?>">
                                     <input type="hidden" name="new_status" value="<?= $news['status'] === 'published' ? 'draft' : 'published' ?>">
-                                    <button type="submit" class="btn btn-sm btn-outline-<?= $news['status'] === 'published' ? 'warning' : 'success' ?> me-1" title="<?= $news['status'] === 'published' ? 'Unpublish' : 'Publish' ?>">
+                                    <button type="submit" class="btn-action <?= $news['status'] === 'published' ? 'btn-action-view' : 'btn-action-edit' ?>" title="<?= $news['status'] === 'published' ? 'Unpublish to Draft' : 'Publish Live' ?>">
                                         <i class="fas fa-<?= $news['status'] === 'published' ? 'eye-slash' : 'eye' ?>"></i>
                                     </button>
                                 </form>
 
-                                <a href="edit.php?id=<?= $news['id'] ?>" class="btn btn-sm btn-outline-primary me-1" title="Edit">
-                                    <i class="fas fa-edit"></i>
+                                <a href="edit.php?id=<?= $news['id'] ?>" class="btn-action btn-action-edit" title="Edit Article">
+                                    <i class="fas fa-pen-to-square"></i>
                                 </a>
                                 
-                                <form method="POST" action="delete.php" class="d-inline" onsubmit="return confirm('Delete this article? This will permanently remove the article and its associated comments and likes.');">
+                                <form method="POST" action="delete.php" class="d-inline m-0" onsubmit="return confirm('Permanently delete this article? All associated comments will also be removed.');">
                                     <?= csrfField() ?>
                                     <input type="hidden" name="id" value="<?= $news['id'] ?>">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
-                                        <i class="fas fa-trash-alt"></i>
+                                    <button type="submit" class="btn-action btn-action-delete" title="Delete Article">
+                                        <i class="fas fa-trash-can"></i>
                                     </button>
                                 </form>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </tbody>
+        </table>
     </div>
 </div>
 
 <?php if ($totalPages > 1): ?>
-    <!-- Reusing existing pagination rendering logic concept -->
-    <nav class="mt-4">
-        <ul class="pagination justify-content-center">
+    <nav class="mt-4" aria-label="Page navigation">
+        <ul class="pagination pagination-sm justify-content-center">
             <?php for ($i = 1; $i <= $totalPages; $i++): ?>
                 <li class="page-item <?= $i === $page ? 'active' : '' ?>">
                     <a class="page-link" href="?page=<?= $i ?>&q=<?= urlencode($q) ?>&status=<?= urlencode($status) ?>&category=<?= urlencode($category) ?>">

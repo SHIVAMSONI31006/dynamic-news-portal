@@ -2,8 +2,10 @@
 $pageTitle = 'Edit User';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../includes/functions.php';
-require_once __DIR__ . '/../includes/header.php';
+require_once __DIR__ . '/../../includes/auth.php';
+require_once __DIR__ . '/../../includes/csrf.php';
 
+requireAdmin();
 if (!isAdmin()) {
     setFlashMessage("Access Denied.", "error");
     redirect('admin/index.php');
@@ -16,6 +18,7 @@ if ($id <= 0) {
 }
 
 $pdo = connectDB();
+$errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verifyCsrfToken(post('csrf_token'));
@@ -23,8 +26,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim(post('name'));
     $role = post('role');
     $status = post('status');
-    
-    $errors = [];
     
     if (empty($name)) $errors[] = "Name is required.";
     if (!in_array($role, ['admin', 'editor', 'user'])) $errors[] = "Invalid role.";
@@ -52,12 +53,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errors[] = "Database error: Could not update user.";
         }
     }
-    
-    if (!empty($errors)) {
-        foreach ($errors as $err) {
-            echo "<div class='alert alert-danger mx-3 mt-3'>" . e($err) . "</div>";
-        }
-    }
 }
 
 try {
@@ -78,55 +73,103 @@ try {
     setFlashMessage("Database error.", "error");
     redirect('admin/users/index.php');
 }
+
+require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3 mb-0 text-gray-800">Edit User</h1>
-    <a href="index.php" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-2"></i>Back to List</a>
-</div>
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h1 class="admin-page-title mb-1">Edit User Account</h1>
+                <p class="admin-page-subtitle mb-0">Modify user profile, role permissions, and system access.</p>
+            </div>
+            <a href="index.php" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-arrow-left me-1"></i> Back to Users
+            </a>
+        </div>
 
-<div class="card shadow-sm border-0 mb-5">
-    <div class="card-body">
-        <?php if ($id === currentUserId()): ?>
-            <div class="alert alert-info">
-                <i class="fas fa-info-circle me-2"></i> You are editing your own account. Some actions (like deactivating or changing role) are disabled for your safety.
+        <?php if (!empty($errors)): ?>
+            <div class="alert alert-danger shadow-sm border-0 mb-4" role="alert">
+                <div class="d-flex align-items-center mb-2">
+                    <i class="fas fa-triangle-exclamation me-2 fs-5"></i>
+                    <strong>Please correct the following errors:</strong>
+                </div>
+                <ul class="mb-0 ps-3">
+                    <?php foreach ($errors as $err): ?>
+                        <li><?= e($err) ?></li>
+                    <?php endforeach; ?>
+                </ul>
             </div>
         <?php endif; ?>
-        
-        <form method="POST" action="">
-            <?= csrfField() ?>
-            
-            <div class="mb-3">
-                <label class="form-label text-muted">Email (Read Only)</label>
-                <input type="email" class="form-control" value="<?= e($user['email']) ?>" readonly disabled>
+
+        <?php if ($id === currentUserId()): ?>
+            <div class="alert alert-info shadow-sm border-0 mb-4" role="alert">
+                <i class="fas fa-circle-info me-2"></i>
+                <strong>Notice:</strong> You are editing your currently active session account. For security, your administrator role and active status cannot be changed here.
             </div>
-            
-            <div class="mb-3">
-                <label for="name" class="form-label fw-bold">Name <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" id="name" name="name" value="<?= e($name) ?>" required maxlength="100">
+        <?php endif; ?>
+
+        <div class="admin-card mb-5">
+            <div class="admin-card-header">
+                <h5 class="admin-card-title mb-0">
+                    <i class="fas fa-user-pen me-2 text-primary"></i> Account Information
+                </h5>
             </div>
-            
-            <div class="row">
-                <div class="col-md-6 mb-4">
-                    <label for="role" class="form-label fw-bold">Role</label>
-                    <select class="form-select" id="role" name="role" <?= ($id === currentUserId()) ? 'readonly style="pointer-events:none;"' : '' ?>>
-                        <option value="admin" <?= $role === 'admin' ? 'selected' : '' ?>>Admin</option>
-                        <option value="editor" <?= $role === 'editor' ? 'selected' : '' ?>>Editor</option>
-                        <option value="user" <?= $role === 'user' ? 'selected' : '' ?>>User</option>
-                    </select>
-                </div>
-                
-                <div class="col-md-6 mb-4">
-                    <label for="status" class="form-label fw-bold">Status</label>
-                    <select class="form-select" id="status" name="status" <?= ($id === currentUserId()) ? 'readonly style="pointer-events:none;"' : '' ?>>
-                        <option value="active" <?= $status === 'active' ? 'selected' : '' ?>>Active</option>
-                        <option value="inactive" <?= $status === 'inactive' ? 'selected' : '' ?>>Inactive</option>
-                    </select>
-                </div>
+            <div class="admin-card-body p-4">
+                <form method="POST" action="edit.php?id=<?= $id ?>" novalidate>
+                    <?= csrfField() ?>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="userEmail" class="form-label fw-semibold text-muted">Email Address (Locked)</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-muted"><i class="fas fa-envelope"></i></span>
+                                <input type="email" id="userEmail" class="form-control bg-light" value="<?= e($user['email']) ?>" readonly disabled>
+                            </div>
+                            <div class="form-text">Email addresses are primary login identifiers.</div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="name" class="form-label fw-semibold">Full Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" value="<?= e($name) ?>" required maxlength="100">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="role" class="form-label fw-semibold">Role <span class="text-danger">*</span></label>
+                            <select class="form-select" id="role" name="role" <?= ($id === currentUserId()) ? 'disabled' : '' ?>>
+                                <option value="admin" <?= $role === 'admin' ? 'selected' : '' ?>>Administrator (Full control)</option>
+                                <option value="editor" <?= $role === 'editor' ? 'selected' : '' ?>>Editor (Manage news & articles)</option>
+                                <option value="user" <?= $role === 'user' ? 'selected' : '' ?>>User / Reader (Comment & profile)</option>
+                            </select>
+                            <?php if ($id === currentUserId()): ?>
+                                <input type="hidden" name="role" value="admin">
+                                <div class="form-text text-muted">Self-role demotion is restricted.</div>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="status" class="form-label fw-semibold">Account Status <span class="text-danger">*</span></label>
+                            <select class="form-select" id="status" name="status" <?= ($id === currentUserId()) ? 'disabled' : '' ?>>
+                                <option value="active" <?= $status === 'active' ? 'selected' : '' ?>>Active (Can login)</option>
+                                <option value="inactive" <?= $status === 'inactive' ? 'selected' : '' ?>>Inactive (Suspended)</option>
+                            </select>
+                            <?php if ($id === currentUserId()): ?>
+                                <input type="hidden" name="status" value="active">
+                                <div class="form-text text-muted">Self-deactivation is restricted.</div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                        <a href="index.php" class="btn btn-light px-4">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="fas fa-save me-2"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
             </div>
-            
-            <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i>Update User</button>
-        </form>
+        </div>
     </div>
 </div>
 

@@ -36,7 +36,7 @@ if (!isset($navCategories)) {
                     NEWS<span class="brand-accent">PORTAL</span>
                 </div>
                 <p class="footer-about">
-                    Dynamic web-based news publishing platform built with PHP and MySQL. Browse the latest news, trending articles, and stories across multiple categories.
+                    Your trusted destination for the latest news, breaking updates, and in-depth stories from Gujarat, India, and around the world. Stay informed with the latest developments across politics, business, technology, education, sports, and more.
                 </p>
                 <div class="footer-social">
                     <a href="#" class="social-icon" title="Facebook"><i class="fab fa-facebook-f"></i></a>

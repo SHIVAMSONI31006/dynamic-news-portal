@@ -4,7 +4,7 @@ require_once __DIR__ . '/includes/functions.php';
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/csrf.php';
 
-// redirect if logged in
+// Redirect if already logged in
 if (isLoggedIn()) {
     redirect('index.php');
 }
@@ -23,6 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = "Security validation failed. Please try again.";
     } elseif (empty($name) || empty($email) || empty($password)) {
         $error = "Please fill in all required fields.";
+    } elseif (mb_strlen($name) < 2) {
+        $error = "Please enter your full name (at least 2 characters).";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = "Please enter a valid email address.";
     } elseif ($password !== $password_confirm) {
@@ -32,20 +34,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         try {
             $pdo = connectDB();
-            $stmt = $pdo->prepare("SELECT id FROM users WHERE email = :email");
+            $stmt = $pdo->prepare("SELECT id FROM users WHERE email = :email LIMIT 1");
             $stmt->execute([':email' => $email]);
             if ($stmt->fetch()) {
-                $error = "This email address is already registered.";
+                $error = "This email address is already registered. Please sign in or use another email.";
             } else {
                 $hashed = password_hash($password, PASSWORD_DEFAULT);
                 $insert = $pdo->prepare("INSERT INTO users (name, email, password, role, status) VALUES (:name, :email, :password, 'user', 'active')");
                 $insert->execute([
-                    ':name' => $name,
-                    ':email' => $email,
+                    ':name'     => $name,
+                    ':email'    => $email,
                     ':password' => $hashed
                 ]);
                 
-                setFlashMessage("Registration successful! You can now log in.", 'success');
+                setFlashMessage("Registration successful! You can now log in with your credentials.", 'success');
                 redirect('login.php');
             }
         } catch (PDOException $e) {
@@ -65,7 +67,7 @@ header('Referrer-Policy: strict-origin-when-cross-origin');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex">
-    <title>Register — <?= e(APP_NAME) ?></title>
+    <title>Create an Account — <?= e(APP_NAME) ?></title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -77,72 +79,170 @@ header('Referrer-Policy: strict-origin-when-cross-origin');
 </head>
 <body>
 <div class="auth-page">
-    <!-- Left Editorial Panel -->
-    <div class="auth-panel">
+    <!-- Left Editorial Panel (Desktop / Tablet) -->
+    <aside class="auth-panel">
         <div class="auth-panel-content">
-            <a href="<?= url('index.php') ?>" style="text-decoration: none;">
-                <div class="brand">NEWS<span>ROOM</span></div>
-            </a>
-            <p class="tagline">
-                Join our community of informed readers. Get access to the latest news and exclusive insights.
-            </p>
-            <div style="margin-top: 40px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.1);">
-                <p style="font-size: 0.82rem; color: rgba(255,255,255,0.4);">
-                    <i class="fas fa-newspaper me-2"></i> Independent Digital Journalism Community
+            <div>
+                <a href="<?= url('index.php') ?>" class="brand-link" title="Return to Homepage">
+                    <div class="brand">THE NEWS<span>ROOM</span></div>
+                    <div class="brand-sub">Global &bull; Perspective &bull; Insight</div>
+                </a>
+                
+                <h2 class="tagline">
+                    Join an informed community of readers, researchers, and global citizens.
+                </h2>
+
+                <ul class="panel-features">
+                    <li>
+                        <i class="fas fa-newspaper" aria-hidden="true"></i>
+                        <span>Unlimited access to breaking news &amp; editorial investigations</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-comments" aria-hidden="true"></i>
+                        <span>Contribute thoughtfully to moderated article comment discussions</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-bell" aria-hidden="true"></i>
+                        <span>Personalized topic alerts and morning intelligence briefings</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-lock" aria-hidden="true"></i>
+                        <span>Zero data reselling &bull; Industry standard bcrypt credential security</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="panel-footer">
+                <a href="<?= url('index.php') ?>" class="back-home-link">
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i>
+                    <span>Return to Newsroom Homepage</span>
+                </a>
+                <p style="font-size: 0.78rem; color: rgba(255,255,255,0.45); margin-top: 14px; margin-bottom: 0;">
+                    &copy; <?= date('Y') ?> <?= e(APP_NAME) ?>. Independent Journalism Community.
                 </p>
             </div>
         </div>
-    </div>
+    </aside>
 
     <!-- Right Form Area -->
-    <div class="auth-form-area">
-        <div class="auth-card" style="border: none; padding: 0; max-width: 400px;">
-            <div class="mb-4">
-                <h1 style="font-family: var(--font-display); font-size: 2rem; font-weight: 800; margin-bottom: 8px;">Create an Account</h1>
-                <p style="color: var(--muted); font-size: 0.95rem;">Join us to stay updated with the latest news.</p>
-            </div>
+    <main class="auth-form-area">
+        <!-- Mobile Brand Header (Visible on mobile/tablet) -->
+        <div class="auth-mobile-header">
+            <a href="<?= url('index.php') ?>" class="brand">
+                THE NEWS<span>ROOM</span>
+            </a>
+            <div class="brand-sub">Global &bull; Perspective &bull; Insight</div>
+        </div>
+
+        <div class="auth-card">
+            <header>
+                <h1>Create an Account</h1>
+                <p class="auth-subtext">Join our reader community to engage with investigative journalism.</p>
+            </header>
                 
             <?php if ($error): ?>
-                <div class="alert alert-danger"><?= e($error) ?></div>
+                <div class="alert alert-danger" role="alert">
+                    <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
+                    <div><?= e($error) ?></div>
+                </div>
             <?php endif; ?>
             
-            <form method="POST" action="<?= url('register.php') ?>">
+            <form method="POST" action="<?= url('register.php') ?>" novalidate>
                 <?= csrfField() ?>
                 
                 <div class="mb-3">
-                    <label for="name" class="form-label">Full Name</label>
-                    <input type="text" class="form-control" id="name" name="name" value="<?= e($name) ?>" placeholder="Enter your full name" required autofocus>
+                    <label for="reg_name" class="form-label">
+                        <span>Full Name</span>
+                        <span class="req" title="Required">*</span>
+                    </label>
+                    <div class="auth-input-group">
+                        <span class="auth-input-icon">
+                            <i class="fas fa-user" aria-hidden="true"></i>
+                        </span>
+                        <input type="text" class="form-control" id="reg_name" name="name" 
+                               value="<?= e($name) ?>" placeholder="e.g. Eleanor Vance" 
+                               autocomplete="name" required autofocus>
+                    </div>
                 </div>
                 
                 <div class="mb-3">
-                    <label for="email" class="form-label">Email Address</label>
-                    <input type="email" class="form-control" id="email" name="email" value="<?= e($email) ?>" placeholder="you@example.com" required>
+                    <label for="reg_email" class="form-label">
+                        <span>Email Address</span>
+                        <span class="req" title="Required">*</span>
+                    </label>
+                    <div class="auth-input-group">
+                        <span class="auth-input-icon">
+                            <i class="fas fa-envelope" aria-hidden="true"></i>
+                        </span>
+                        <input type="email" class="form-control" id="reg_email" name="email" 
+                               value="<?= e($email) ?>" placeholder="name@example.com" 
+                               autocomplete="email" required>
+                    </div>
                 </div>
                 
                 <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Min. 6 characters" required>
-                    <div class="form-text">Must be at least 6 characters.</div>
+                    <label for="reg_password" class="form-label">
+                        <span>Password</span>
+                        <span class="req" title="Required">*</span>
+                    </label>
+                    <div class="auth-input-group has-toggle">
+                        <span class="auth-input-icon">
+                            <i class="fas fa-lock" aria-hidden="true"></i>
+                        </span>
+                        <input type="password" class="form-control" id="reg_password" name="password" 
+                               placeholder="Minimum 6 characters" autocomplete="new-password" required>
+                        <button type="button" class="auth-password-toggle" data-target="reg_password" 
+                                aria-label="Toggle password visibility" aria-pressed="false" tabindex="0">
+                            <i class="far fa-eye" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <div class="password-meter-wrap">
+                        <div class="password-meter" aria-hidden="true">
+                            <div class="password-meter-bar" id="passwordMeterBar"></div>
+                        </div>
+                        <div class="password-meter-text" id="passwordMeterText"></div>
+                    </div>
                 </div>
                 
                 <div class="mb-4">
-                    <label for="password_confirm" class="form-label">Confirm Password</label>
-                    <input type="password" class="form-control" id="password_confirm" name="password_confirm" placeholder="Re-enter your password" required>
+                    <label for="reg_password_confirm" class="form-label">
+                        <span>Confirm Password</span>
+                        <span class="req" title="Required">*</span>
+                    </label>
+                    <div class="auth-input-group has-toggle">
+                        <span class="auth-input-icon">
+                            <i class="fas fa-shield-alt" aria-hidden="true"></i>
+                        </span>
+                        <input type="password" class="form-control" id="reg_password_confirm" name="password_confirm" 
+                               placeholder="Re-enter your password" autocomplete="new-password" required>
+                        <button type="button" class="auth-password-toggle" data-target="reg_password_confirm" 
+                                aria-label="Toggle confirm password visibility" aria-pressed="false" tabindex="0">
+                            <i class="far fa-eye" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <div class="password-match-feedback" id="passwordMatchFeedback"></div>
                 </div>
                 
-                <button type="submit" class="btn btn-accent w-100" style="height: 50px; font-size: 0.95rem;">
+                <button type="submit" class="btn btn-accent" data-loading-text="Creating Account...">
                     Create Account
                 </button>
                 
-                <div class="text-center mt-4">
-                    <span style="color: var(--muted); font-size: 0.9rem;">Already have an account?</span> 
-                    <a href="<?= url('login.php') ?>" style="color: var(--accent); font-weight: 600; font-size: 0.9rem;">Login here</a>
+                <div class="auth-switch-text">
+                    <span>Already have an account?</span> 
+                    <a href="<?= url('login.php') ?>">Sign in here</a>
+                </div>
+
+                <div class="auth-bottom-nav">
+                    <a href="<?= url('index.php') ?>">
+                        <i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Homepage
+                    </a>
                 </div>
             </form>
         </div>
-    </div>
+    </main>
 </div>
 
 <script src="<?= url('assets/js/bootstrap.bundle.min.js') ?>"></script>
+<script src="<?= url('assets/js/auth.js') ?>?v=<?= time() ?>"></script>
 </body>
 </html>

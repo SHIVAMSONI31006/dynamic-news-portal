@@ -2,7 +2,10 @@
 $pageTitle = 'Create News';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../includes/functions.php';
-require_once __DIR__ . '/../includes/header.php';
+require_once __DIR__ . '/../../includes/auth.php';
+require_once __DIR__ . '/../../includes/csrf.php';
+
+requireAdmin();
 
 $pdo = connectDB();
 
@@ -137,99 +140,126 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     
-    // Show errors if any
-    if (!empty($errors)) {
-        foreach ($errors as $err) {
-            echo "<div class='alert alert-danger mx-3 mt-3'>" . e($err) . "</div>";
-        }
+}
+
+require_once __DIR__ . '/../includes/header.php';
+
+if (!empty($errors)) {
+    foreach ($errors as $err) {
+        echo "<div class='alert alert-danger mx-3 mt-3'>" . e($err) . "</div>";
     }
 }
 ?>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3 mb-0 text-gray-800">Create News</h1>
-    <a href="index.php" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-2"></i>Back to List</a>
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+    <div>
+        <h2 class="h4 mb-1 text-dark fw-bold">Compose News Story</h2>
+        <p class="text-muted small mb-0">Draft a new article, attach high-resolution media, and schedule publication.</p>
+    </div>
+    <a href="index.php" class="btn btn-outline-secondary btn-sm px-3">
+        <i class="fas fa-arrow-left me-1"></i> Back to Articles
+    </a>
 </div>
 
-<div class="card shadow-sm border-0 mb-5">
-    <div class="card-body">
-        <form method="POST" action="" enctype="multipart/form-data">
+<div class="admin-card mb-5">
+    <div class="admin-card-header py-3">
+        <h5 class="admin-card-title mb-0">
+            <i class="fas fa-feather-pointed text-danger me-2"></i> Story Content & Configuration
+        </h5>
+    </div>
+    <div class="admin-card-body p-4">
+        <form method="POST" action="" enctype="multipart/form-data" novalidate>
             <?= csrfField() ?>
             
-            <div class="row">
+            <div class="row g-4">
                 <div class="col-lg-8">
                     
                     <div class="mb-3">
-                        <label for="title" class="form-label fw-bold">Title <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="title" name="title" value="<?= e($title) ?>" required maxlength="255">
+                        <label for="title" class="form-label small fw-semibold text-dark mb-1">Headline Title <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="title" name="title" value="<?= e($title) ?>" required maxlength="255" placeholder="Enter compelling, fact-checked headline...">
                     </div>
                     
                     <div class="mb-3">
-                        <label for="short_description" class="form-label fw-bold">Short Description <span class="text-danger">*</span></label>
-                        <textarea class="form-control" id="short_description" name="short_description" rows="2" required maxlength="500"><?= e($short_description) ?></textarea>
-                        <div class="form-text">Brief summary displayed on homepage and lists.</div>
+                        <label for="short_description" class="form-label small fw-semibold text-dark mb-1">Lead Excerpt / Summary <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="short_description" name="short_description" rows="2" required maxlength="500" placeholder="A concise 1-2 sentence lead paragraph shown in card previews..."><?= e($short_description) ?></textarea>
+                        <div class="form-text">Brief summary displayed on homepage cards and search results.</div>
                     </div>
                     
                     <div class="mb-3">
-                        <label for="content" class="form-label fw-bold">Content <span class="text-danger">*</span></label>
-                        <textarea class="form-control" id="content" name="content" rows="15" required><?= e($content) ?></textarea>
-                        <div class="form-text">Basic HTML tags allowed (p, b, i, strong, em, h2, h3, h4, ul, ol, li, blockquote, a).</div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label for="content" class="form-label small fw-semibold text-dark mb-0">Full Story Content <span class="text-danger">*</span></label>
+                            <div class="btn-group btn-group-sm" role="group" aria-label="Editor Tag Helpers">
+                                <button type="button" class="btn btn-light border btn-sm py-0 px-2" onclick="insertTag('content', '<p>', '</p>')" title="Paragraph">&lt;p&gt;</button>
+                                <button type="button" class="btn btn-light border btn-sm py-0 px-2" onclick="insertTag('content', '<strong>', '</strong>')" title="Bold"><i class="fas fa-bold"></i></button>
+                                <button type="button" class="btn btn-light border btn-sm py-0 px-2" onclick="insertTag('content', '<em>', '</em>')" title="Italic"><i class="fas fa-italic"></i></button>
+                                <button type="button" class="btn btn-light border btn-sm py-0 px-2" onclick="insertTag('content', '<h3>', '</h3>')" title="Heading 3">H3</button>
+                                <button type="button" class="btn btn-light border btn-sm py-0 px-2" onclick="insertTag('content', '<blockquote>', '</blockquote>')" title="Blockquote"><i class="fas fa-quote-left"></i></button>
+                                <button type="button" class="btn btn-light border btn-sm py-0 px-2" onclick="insertTag('content', '<ul>\n  <li>', '</li>\n</ul>')" title="Bullet List"><i class="fas fa-list-ul"></i></button>
+                            </div>
+                        </div>
+                        <textarea class="form-control" id="content" name="content" rows="14" required placeholder="Write the full report here..."><?= e($content) ?></textarea>
+                        <div class="form-text">Clean HTML formatting is supported: &lt;p&gt;, &lt;b&gt;, &lt;strong&gt;, &lt;em&gt;, &lt;h2&gt;, &lt;h3&gt;, &lt;blockquote&gt;, &lt;ul&gt;, &lt;li&gt;.</div>
                     </div>
                     
                 </div>
                 
                 <div class="col-lg-4">
                     
-                    <div class="card bg-light border-0 mb-4">
-                        <div class="card-body">
-                            <h6 class="fw-bold mb-3"><i class="fas fa-cogs me-2"></i>Publishing Settings</h6>
-                            
-                            <div class="mb-3">
-                                <label for="status" class="form-label">Status</label>
-                                <select class="form-select" id="status" name="status">
-                                    <option value="draft" <?= $status === 'draft' ? 'selected' : '' ?>>Draft</option>
-                                    <option value="published" <?= $status === 'published' ? 'selected' : '' ?>>Published</option>
-                                    <option value="archived" <?= $status === 'archived' ? 'selected' : '' ?>>Archived</option>
-                                </select>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="category_id" class="form-label">Category <span class="text-danger">*</span></label>
-                                <select class="form-select" id="category_id" name="category_id" required>
-                                    <option value="">Select Category...</option>
-                                    <?php foreach ($categories as $cat): ?>
-                                        <option value="<?= $cat['id'] ?>" <?= $category_id == $cat['id'] ? 'selected' : '' ?>><?= e($cat['name']) ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                            
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured" value="1" <?= $is_featured ? 'checked' : '' ?>>
-                                <label class="form-check-label" for="is_featured">
-                                    Mark as Featured
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="is_breaking" name="is_breaking" value="1" <?= $is_breaking ? 'checked' : '' ?>>
-                                <label class="form-check-label" for="is_breaking">
-                                    Mark as Breaking News
-                                </label>
-                            </div>
+                    <div class="p-3 bg-light rounded border mb-4">
+                        <h6 class="fw-bold mb-3 text-dark small text-uppercase" style="letter-spacing: 0.5px;">
+                            <i class="fas fa-sliders me-2 text-danger"></i> Editorial Settings
+                        </h6>
+                        
+                        <div class="mb-3">
+                            <label for="status" class="form-label small fw-semibold text-dark mb-1">Publication Status</label>
+                            <select class="form-select form-select-sm" id="status" name="status">
+                                <option value="draft" <?= $status === 'draft' ? 'selected' : '' ?>>Draft (Internal review)</option>
+                                <option value="published" <?= $status === 'published' ? 'selected' : '' ?>>Published (Live immediately)</option>
+                                <option value="archived" <?= $status === 'archived' ? 'selected' : '' ?>>Archived (Offline)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="category_id" class="form-label small fw-semibold text-dark mb-1">Primary Category <span class="text-danger">*</span></label>
+                            <select class="form-select form-select-sm" id="category_id" name="category_id" required>
+                                <option value="">Select Topic...</option>
+                                <?php foreach ($categories as $cat): ?>
+                                    <option value="<?= $cat['id'] ?>" <?= $category_id == $cat['id'] ? 'selected' : '' ?>><?= e($cat['name']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured" value="1" <?= $is_featured ? 'checked' : '' ?>>
+                            <label class="form-check-label small fw-semibold" for="is_featured">
+                                <i class="fas fa-star text-warning me-1"></i> Featured Story
+                            </label>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="is_breaking" name="is_breaking" value="1" <?= $is_breaking ? 'checked' : '' ?>>
+                            <label class="form-check-label small fw-semibold" for="is_breaking">
+                                <i class="fas fa-bolt text-danger me-1"></i> Breaking Alert
+                            </label>
                         </div>
                     </div>
                     
-                    <div class="card bg-light border-0">
-                        <div class="card-body">
-                            <h6 class="fw-bold mb-3"><i class="fas fa-image me-2"></i>Featured Image</h6>
-                            
-                            <div class="mb-3">
-                                <label for="featured_image" class="form-label">Upload Image</label>
-                                <input class="form-control form-control-sm" id="featured_image" name="featured_image" type="file" accept=".jpg,.jpeg,.png,.webp">
-                                <div class="form-text">Max 5MB. Formats: JPG, PNG, WEBP.</div>
+                    <div class="p-3 bg-light rounded border">
+                        <h6 class="fw-bold mb-3 text-dark small text-uppercase" style="letter-spacing: 0.5px;">
+                            <i class="fas fa-image me-2 text-primary"></i> Cover Image
+                        </h6>
+                        
+                        <div class="mb-3">
+                            <label for="featured_image" class="form-label small fw-semibold text-dark mb-1">Upload Photo</label>
+                            <input class="form-control form-control-sm" id="featured_image" name="featured_image" type="file" accept=".jpg,.jpeg,.png,.webp">
+                            <div id="imagePreviewContainer" class="mt-2 text-center" style="display:none;">
+                                <img id="imagePreview" src="#" alt="Preview" class="img-fluid rounded border shadow-sm" style="max-height: 160px;">
                             </div>
-                            
-                            <button type="submit" class="btn btn-primary w-100 mt-2"><i class="fas fa-save me-2"></i>Save Article</button>
+                            <div class="form-text small">Max 5MB. Formats: JPG, PNG, WEBP.</div>
                         </div>
+                        
+                        <button type="submit" class="btn btn-danger w-100 py-2 shadow-sm fw-semibold">
+                            <i class="fas fa-check-circle me-1"></i> Save Publication
+                        </button>
                     </div>
                     
                 </div>
@@ -237,5 +267,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
     </div>
 </div>
+
+<script>
+    function insertTag(textareaId, openTag, closeTag) {
+        const el = document.getElementById(textareaId);
+        if (!el) return;
+        const start = el.selectionStart;
+        const end = el.selectionEnd;
+        const text = el.value;
+        const selected = text.substring(start, end) || 'text';
+        const replacement = openTag + selected + closeTag;
+        el.value = text.substring(0, start) + replacement + text.substring(end);
+        el.focus();
+        el.setSelectionRange(start + openTag.length, start + openTag.length + selected.length);
+    }
+</script>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

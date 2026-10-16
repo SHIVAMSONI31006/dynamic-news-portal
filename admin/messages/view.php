@@ -2,7 +2,7 @@
 $pageTitle = 'View Message';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../includes/functions.php';
-require_once __DIR__ . '/../includes/header.php';
+require_once __DIR__ . '/../../includes/auth.php';
 
 if (!isAdminOrEditor()) {
     setFlashMessage("Access Denied.", "error");
@@ -38,50 +38,72 @@ try {
     setFlashMessage("Database error.", "error");
     redirect('admin/messages/index.php');
 }
+
+require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3 mb-0 text-gray-800">View Message</h1>
-    <a href="index.php" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-2"></i>Back to List</a>
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+    <div>
+        <h2 class="h4 mb-1 text-dark fw-bold">Inquiry Details</h2>
+        <p class="text-muted small mb-0">Message ID #<?= $msg['id'] ?> received on <?= date('F j, Y \a\t g:i A', strtotime($msg['created_at'])) ?></p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="mailto:<?= e($msg['email']) ?>?subject=Re:%20<?= urlencode($msg['subject']) ?>" class="btn btn-primary btn-sm px-3 shadow-sm">
+            <i class="fas fa-reply me-1"></i> Reply via Email
+        </a>
+        <a href="index.php" class="btn btn-outline-secondary btn-sm px-3">
+            <i class="fas fa-arrow-left me-1"></i> Back to Inbox
+        </a>
+    </div>
 </div>
 
-<div class="card shadow-sm border-0 mb-5">
-    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-        <h5 class="mb-0 fw-bold"><?= e($msg['subject']) ?></h5>
-        <span class="text-muted small"><?= date('F j, Y, g:i a', strtotime($msg['created_at'])) ?></span>
+<div class="admin-card mb-5">
+    <div class="admin-card-header py-3 d-flex justify-content-between align-items-center">
+        <h5 class="admin-card-title mb-0">
+            <i class="fas fa-envelope-open-text text-danger me-2"></i> <?= e($msg['subject']) ?>
+        </h5>
+        <span class="badge-status-published"><i class="fas fa-circle" style="font-size: 6px;"></i> Read</span>
     </div>
-    <div class="card-body">
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <p class="mb-1 text-muted small fw-bold">From</p>
-                <p class="mb-0 fs-5"><?= e($msg['name']) ?></p>
-                <a href="mailto:<?= e($msg['email']) ?>" class="text-decoration-none"><?= e($msg['email']) ?></a>
+    <div class="admin-card-body p-4">
+        
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 pb-3 mb-4 border-bottom">
+            <div class="d-flex align-items-center gap-3">
+                <div style="width: 46px; height: 46px; border-radius: 50%; background: #0B132B; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem;">
+                    <?= strtoupper(substr(e($msg['name']), 0, 1)) ?>
+                </div>
+                <div>
+                    <h6 class="mb-0 fw-bold text-dark"><?= e($msg['name']) ?></h6>
+                    <a href="mailto:<?= e($msg['email']) ?>" class="text-primary small text-decoration-none">
+                        <?= e($msg['email']) ?>
+                    </a>
+                </div>
             </div>
-            <div class="col-md-6 text-md-end mt-3 mt-md-0">
-                <p class="mb-1 text-muted small fw-bold">Status</p>
-                <?php if ($msg['status'] === 'unread'): ?>
-                    <span class="badge bg-warning text-dark"><i class="fas fa-envelope me-1"></i>Unread</span>
-                <?php else: ?>
-                    <span class="badge bg-light text-dark border"><i class="fas fa-envelope-open me-1"></i>Read</span>
-                <?php endif; ?>
+            <div class="text-md-end text-muted small">
+                <div><i class="fas fa-clock me-1"></i> Received <?= date('F j, Y, g:i A', strtotime($msg['created_at'])) ?></div>
             </div>
         </div>
         
-        <hr>
-        
-        <div class="mt-4">
-            <p class="text-muted small fw-bold mb-2">Message</p>
-            <div class="p-4 bg-light rounded" style="white-space: pre-wrap; font-size: 1.05rem;"><?= e($msg['message']) ?></div>
+        <div class="mb-4">
+            <label class="form-label small fw-bold text-uppercase text-muted" style="letter-spacing: 0.5px;">Message Body</label>
+            <div class="p-4 bg-light rounded border" style="white-space: pre-wrap; font-size: 1rem; line-height: 1.6; color: #1E293B;">
+                <?= e($msg['message']) ?>
+            </div>
         </div>
-    </div>
-    <div class="card-footer bg-white py-3">
-        <form method="POST" action="delete.php" class="d-inline" onsubmit="return confirm('Delete this message permanently?');">
-            <?= csrfField() ?>
-            <input type="hidden" name="id" value="<?= $msg['id'] ?>">
-            <button type="submit" class="btn btn-outline-danger">
-                <i class="fas fa-trash-alt me-2"></i>Delete Message
-            </button>
-        </form>
+
+        <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+            <a href="mailto:<?= e($msg['email']) ?>" class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-paper-plane me-1"></i> Direct Email Reply
+            </a>
+            
+            <form method="POST" action="delete.php" class="d-inline m-0" onsubmit="return confirm('Permanently delete this message?');">
+                <?= csrfField() ?>
+                <input type="hidden" name="id" value="<?= $msg['id'] ?>">
+                <button type="submit" class="btn btn-outline-danger btn-sm">
+                    <i class="fas fa-trash-can me-1"></i> Delete Message
+                </button>
+            </form>
+        </div>
+
     </div>
 </div>
 

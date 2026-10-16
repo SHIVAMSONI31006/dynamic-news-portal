@@ -49,6 +49,7 @@ if (!function_exists('env')) {
 if (!defined('APP_ENV'))   define('APP_ENV', env('APP_ENV', 'development'));
 if (!defined('APP_DEBUG')) define('APP_DEBUG', filter_var(env('APP_DEBUG', APP_ENV === 'development'), FILTER_VALIDATE_BOOLEAN));
 if (!defined('APP_URL'))   define('APP_URL', rtrim(env('APP_URL', ''), '/'));
+if (!defined('PUBLIC_URL'))define('PUBLIC_URL', rtrim(env('PUBLIC_URL', ''), '/'));
 
 if (!defined('DB_HOST'))   define('DB_HOST', env('DB_HOST', 'localhost'));
 if (!defined('DB_PORT'))   define('DB_PORT', env('DB_PORT', '3306'));

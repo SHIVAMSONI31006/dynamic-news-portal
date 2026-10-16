@@ -54,44 +54,64 @@ function url(string $path = ''): string
 {
     $path = ltrim($path, '/');
     $isAdminPath = str_starts_with($path, 'admin/') || $path === 'admin';
-    if ($isAdminPath) {
-        $path = preg_replace('#^admin/?#', '', $path);
-    }
+    $cleanAdminPath = $isAdminPath ? preg_replace('#^admin/?#', '', $path) : $path;
+    $adminTarget = $cleanAdminPath !== '' ? 'admin/' . $cleanAdminPath : 'admin/index.php';
     
-    // Check if APP_URL is defined from environment configuration
+    // 1. Check if APP_URL is defined from environment configuration (e.g. production domain)
     if (defined('APP_URL') && APP_URL !== '') {
-        return rtrim(APP_URL, '/') . '/' . ($isAdminPath ? 'admin/' . $path : $path);
+        $baseUrl = rtrim(APP_URL, '/');
+        return $baseUrl . '/' . ($isAdminPath ? $adminTarget : $path);
     }
     
-    $clientUrl = 'http://localhost:8000';
-    $backendUrl = 'http://localhost:9000';
+    // 2. Identify server port and runtime context
+    $port = (string)($_SERVER['SERVER_PORT'] ?? '');
+    $isDev = !defined('APP_ENV') || APP_ENV === 'development';
     
-    $port = $_SERVER['SERVER_PORT'] ?? '';
-    if ($port == '8000' || $port == '9000') {
-        if ($isAdminPath) {
-            return $backendUrl . '/' . $path;
+    // In local dual-port mode (Server 1: 8000, Server 2: 9000):
+    if ($isDev && ($port === '8000' || $port === '9000')) {
+        // Static assets serve locally from current server root
+        if (str_starts_with($path, 'assets/') || str_starts_with($path, 'uploads/')) {
+            return '/' . $path;
         }
-        return $clientUrl . '/' . $path;
+
+        // On Port 8000 (Public Server):
+        if ($port === '8000') {
+            // Admin requests on Port 8000 route to dedicated Admin server on Port 9000
+            if ($isAdminPath) {
+                return 'http://localhost:9000/' . $adminTarget;
+            }
+            // All public requests (login.php, register.php, index.php, etc.) are root-relative
+            return '/' . $path;
+        }
+
+        // On Port 9000 (Admin CMS Server):
+        if ($port === '9000') {
+            // Admin requests stay root-relative on Port 9000
+            if ($isAdminPath) {
+                return '/' . $adminTarget;
+            }
+            // Public links ("View Website") from Admin CMS point to configured PUBLIC_URL or local dev server
+            $publicClientUrl = defined('PUBLIC_URL') && PUBLIC_URL !== '' ? PUBLIC_URL : 'http://localhost:8000';
+            return $publicClientUrl . '/' . $path;
+        }
     }
     
-    // Fallback for generic XAMPP setups
+    // 3. Dynamic Base Path for standard Web Servers (Apache/XAMPP, Nginx, or production without APP_URL)
     static $basePath = null;
     if ($basePath === null) {
-        $scriptDir = dirname($_SERVER['SCRIPT_NAME'] ?? '');
-        $projectRoot = dirname(__DIR__);
-        $docRoot = realpath($_SERVER['DOCUMENT_ROOT'] ?? '');
-        if ($docRoot && $projectRoot && str_starts_with($projectRoot, $docRoot)) {
-            $basePath = str_replace('\\', '/', substr($projectRoot, strlen($docRoot)));
+        $script = $_SERVER['SCRIPT_NAME'] ?? '';
+        $scriptDir = str_replace('\\', '/', dirname($script));
+        if ($scriptDir === '/' || $scriptDir === '.' || $scriptDir === '') {
+            $basePath = '';
         } else {
-            $basePath = $scriptDir;
-            if (preg_match('#(/[^/]+)(/admin.*)$#', $basePath, $m)) {
-                $basePath = $m[1];
-            }
+            // Strip any trailing /admin or /admin/...
+            $basePath = preg_replace('#/admin(/.*)?$#i', '', $scriptDir);
+            $basePath = rtrim($basePath, '/');
         }
-        $basePath = rtrim($basePath, '/');
     }
 
-    return $basePath . '/' . ($isAdminPath ? 'admin/' . $path : $path);
+    $target = $isAdminPath ? $adminTarget : $path;
+    return ($basePath !== '' ? $basePath : '') . '/' . $target;
 }
 
 /**
@@ -163,7 +183,11 @@ function redirect(string $location): never
 function setFlashMessage(string $message, string $type = 'info'): void
 {
     if (session_status() !== PHP_SESSION_ACTIVE) {
-        session_start();
+        if (function_exists('startSession')) {
+            startSession();
+        } else {
+            session_start();
+        }
     }
     $_SESSION['flash_message'] = [
         'message' => $message,

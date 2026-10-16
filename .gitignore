@@ -1,0 +1,23 @@
+# Local server PID and temporary runtime state
+.dual_servers.json
+logs/
+scratch/
+
+# Environment and secrets
+.env
+.env.local
+
+# Dependencies
+vendor/
+node_modules/
+
+# Logs and cache
+*.log
+
+# IDE and OS
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini
+.DS_Store
+

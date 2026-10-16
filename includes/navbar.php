@@ -68,7 +68,7 @@ $currentScript = basename($_SERVER['SCRIPT_NAME'] ?? '');
                 <li class="nav-item <?= $currentScript === 'index.php' ? 'active' : '' ?>">
                     <a class="nav-link" href="<?= url('index.php') ?>">Home</a>
                 </li>
-                <li class="nav-item <?= $currentScript === 'latest.php' ? 'active' : '' ?>">
+                <li class="nav-item <?= ($currentScript === 'search.php' && ($_GET['sort'] ?? '') === 'latest') ? 'active' : '' ?>">
                     <a class="nav-link" href="<?= url('search.php?sort=latest') ?>">Latest</a>
                 </li>
 
@@ -89,7 +89,7 @@ $currentScript = basename($_SERVER['SCRIPT_NAME'] ?? '');
                     </ul>
                 </li>
                 
-                <li class="nav-item <?= $currentScript === 'trending.php' ? 'active' : '' ?>">
+                <li class="nav-item <?= ($currentScript === 'search.php' && ($_GET['sort'] ?? '') === 'trending') ? 'active' : '' ?>">
                     <a class="nav-link" href="<?= url('search.php?sort=trending') ?>">Trending</a>
                 </li>
                 <li class="nav-item <?= $currentScript === 'about.php' ? 'active' : '' ?>">
@@ -113,10 +113,11 @@ $currentScript = basename($_SERVER['SCRIPT_NAME'] ?? '');
                         <i class="far fa-user"></i> <?= e(currentUserName()) ?>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="<?= url('profile.php') ?>"><i class="fas fa-user-circle me-2"></i>My Profile</a></li>
                         <?php if (isAdminOrEditor()): ?>
                             <li><a class="dropdown-item" href="<?= url('admin/index.php') ?>"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
-                            <li><hr class="dropdown-divider"></li>
                         <?php endif; ?>
+                        <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item text-danger" href="<?= url('logout.php') ?>"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
                     </ul>
                 </div>

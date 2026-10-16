@@ -23,9 +23,18 @@ function startSession(): void
         return;
     }
 
+    // Determine application context for session isolation
+    $port = (string)($_SERVER['SERVER_PORT'] ?? '');
+    $script = (string)($_SERVER['SCRIPT_NAME'] ?? '');
+    $uri = (string)($_SERVER['REQUEST_URI'] ?? '');
+
+    // Is this the dedicated Admin CMS (port 9000 or /admin path)?
+    $isAdmin = ($port === '9000') || str_contains($script, '/admin') || str_contains($uri, '/admin');
+
+    // Separate session cookie names to prevent cookie collisions on localhost
+    $sessionName = $isAdmin ? 'NEWS_ADMIN_SESSION' : 'NEWS_PUBLIC_SESSION';
+
     // Session configuration — secure defaults
-    // NOTE: 'cookie_secure' is false for local XAMPP (HTTP).
-    // Set to true when deploying over HTTPS.
     $isSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
 
     session_set_cookie_params([
@@ -33,11 +42,11 @@ function startSession(): void
         'path'     => '/',
         'domain'   => '',
         'secure'   => $isSecure,      // HTTPS only when available
-        'httponly'  => true,           // Not accessible via JavaScript
-        'samesite'  => 'Lax',         // CSRF protection via SameSite
+        'httponly' => true,           // Not accessible via JavaScript
+        'samesite' => 'Lax',          // CSRF protection via SameSite
     ]);
 
-    session_name('NP_SESSION');
+    session_name($sessionName);
     session_start();
 
     // Session timeout: 30 minutes of inactivity
@@ -46,6 +55,7 @@ function startSession(): void
         // Session expired — destroy and restart
         session_unset();
         session_destroy();
+        session_name($sessionName);
         session_start();
     }
     $_SESSION['last_activity'] = time();
