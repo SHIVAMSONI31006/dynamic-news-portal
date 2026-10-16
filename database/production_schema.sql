@@ -4,15 +4,13 @@
 -- Importable into ANY hosted MySQL / MariaDB database (e.g. TiDB,
 -- Aiven, Clever Cloud, cPanel, phpMyAdmin, AWS RDS).
 -- Does NOT execute CREATE DATABASE or USE statements.
+-- Ensure the target database is selected before importing.
 -- ============================================================
 
-USE test;
-
 -- ============================================================
-
 -- TABLE 1: users
 -- ============================================================
--- Stores all users â€” admins, editors, and public users.
+-- Stores all users — admins, editors, and public users.
 -- Passwords stored as bcrypt hashes via password_hash().
 -- ============================================================
 CREATE TABLE IF NOT EXISTS `users` (
@@ -34,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 -- ============================================================
 -- TABLE 2: categories
 -- ============================================================
--- News categories â€” managed dynamically by admin.
+-- News categories — managed dynamically by admin.
 -- Slugs are URL-friendly identifiers (e.g. "ai-ml").
 -- ============================================================
 CREATE TABLE IF NOT EXISTS `categories` (
@@ -55,7 +53,7 @@ CREATE TABLE IF NOT EXISTS `categories` (
 -- ============================================================
 -- TABLE 3: news
 -- ============================================================
--- Primary table â€” stores all articles.
+-- Primary table — stores all articles.
 -- Status: draft / published / archived.
 -- is_featured and is_breaking control homepage placement.
 -- views tracks article read count.
@@ -102,7 +100,7 @@ CREATE TABLE IF NOT EXISTS `news` (
 -- ============================================================
 -- User comments on news articles, with moderation support.
 -- Status: pending / approved / rejected.
--- Cascades on delete â€” if a news article or user is removed,
+-- Cascades on delete — if a news article or user is removed,
 -- their comments are also removed.
 -- ============================================================
 CREATE TABLE IF NOT EXISTS `comments` (
@@ -132,7 +130,7 @@ CREATE TABLE IF NOT EXISTS `comments` (
 -- ============================================================
 -- TABLE 5: likes
 -- ============================================================
--- One like per user per article â€” enforced by UNIQUE constraint.
+-- One like per user per article — enforced by UNIQUE constraint.
 -- Cascades on delete of either news or user.
 -- ============================================================
 CREATE TABLE IF NOT EXISTS `likes` (
@@ -158,7 +156,7 @@ CREATE TABLE IF NOT EXISTS `likes` (
 -- TABLE 6: contact_messages
 -- ============================================================
 -- Messages submitted through the public contact form.
--- Status: unread / read â€” for admin tracking.
+-- Status: unread / read — for admin tracking.
 -- ============================================================
 CREATE TABLE IF NOT EXISTS `contact_messages` (
     `id`            INT UNSIGNED    NOT NULL AUTO_INCREMENT,
@@ -191,7 +189,7 @@ CREATE TABLE IF NOT EXISTS `newsletter_subscribers` (
 
 
 -- ============================================================
--- SEED DATA â€” Demo data for development & demonstration
+-- SEED DATA — Demo data for development & demonstration
 -- ============================================================
 -- These records provide realistic content for development
 -- and project demonstration. They are clearly structured as
@@ -241,7 +239,7 @@ INSERT INTO `categories` (`name`, `slug`, `description`, `status`) VALUES
 ('AI & ML',        'ai-ml',          'Artificial Intelligence and Machine Learning updates.',     'active'),
 ('Business',       'business',       'Business, economy and market news.',                        'active'),
 ('Education',      'education',      'Education news, policies and opportunities.',               'active'),
-('Sports',         'sports',         'Sports news â€” cricket, football and more.',                 'active'),
+('Sports',         'sports',         'Sports news — cricket, football and more.',                 'active'),
 ('Entertainment',  'entertainment',  'Bollywood, Hollywood, TV and celebrity news.',              'active');
 
 
@@ -256,12 +254,12 @@ INSERT INTO `categories` (`name`, `slug`, `description`, `status`) VALUES
 INSERT INTO `news`
     (`category_id`, `author_id`, `title`, `slug`, `short_description`, `content`, `featured_image`, `status`, `is_featured`, `is_breaking`, `views`, `published_at`)
 VALUES
--- Article 1: Featured + Breaking â€” AI & ML (category 5)
+-- Article 1: Featured + Breaking — AI & ML (category 5)
 (5, 1,
- 'India Launches National AI Mission with â‚¹10,000 Crore Investment',
+ 'India Launches National AI Mission with ₹10,000 Crore Investment',
  'india-launches-national-ai-mission',
- 'The Government of India has announced a landmark â‚¹10,000 crore National AI Mission aimed at fostering innovation, building AI infrastructure, and establishing India as a global AI hub.',
- '<p>In a historic move, the Government of India has announced the launch of the National AI Mission with an investment of â‚¹10,000 crore over the next five years. The mission aims to build a robust AI ecosystem across the country.</p>
+ 'The Government of India has announced a landmark ₹10,000 crore National AI Mission aimed at fostering innovation, building AI infrastructure, and establishing India as a global AI hub.',
+ '<p>In a historic move, the Government of India has announced the launch of the National AI Mission with an investment of ₹10,000 crore over the next five years. The mission aims to build a robust AI ecosystem across the country.</p>
 <p>Key highlights of the mission include:</p>
 <ul>
     <li>Establishment of AI Centres of Excellence in 10 major cities</li>
@@ -270,16 +268,16 @@ VALUES
     <li>Support for AI startups with dedicated funding</li>
     <li>Ethical AI framework and governance guidelines</li>
 </ul>
-<p>The Prime Minister stated, "Artificial Intelligence is not just a technology â€” it is a transformational force that will redefine how India solves its biggest challenges, from healthcare to agriculture to education."</p>
+<p>The Prime Minister stated, "Artificial Intelligence is not just a technology — it is a transformational force that will redefine how India solves its biggest challenges, from healthcare to agriculture to education."</p>
 <p>The mission will be implemented in three phases, with Phase 1 focusing on infrastructure and talent development. Leading institutions like IITs, IIITs, and private tech companies will be partners in this initiative.</p>
 <p>Industry leaders have welcomed the announcement, calling it a game-changer for India\'s technology landscape. The mission is expected to create over 500,000 new AI-related jobs by 2030.</p>',
  'uploads/news/ai-mission-india.jpg',
  'published', 1, 1, 1247,
  '2026-09-24 08:00:00'),
 
--- Article 2: Featured â€” Technology (category 4)
+-- Article 2: Featured — Technology (category 4)
 (4, 1,
- 'ISRO Successfully Tests Reusable Launch Vehicle â€” A New Era for Indian Space',
+ 'ISRO Successfully Tests Reusable Launch Vehicle — A New Era for Indian Space',
  'isro-tests-reusable-launch-vehicle',
  'ISRO has completed a successful autonomous landing test of its Reusable Launch Vehicle, marking a significant milestone in reducing space launch costs.',
  '<p>The Indian Space Research Organisation (ISRO) has achieved a major milestone with the successful test of its Reusable Launch Vehicle (RLV) technology demonstrator. The test involved an autonomous landing from a height of 4.5 km.</p>
@@ -290,9 +288,9 @@ VALUES
  'published', 1, 0, 893,
  '2026-09-23 14:30:00'),
 
--- Article 3: Breaking â€” Gujarat (category 2)
+-- Article 3: Breaking — Gujarat (category 2)
 (2, 1,
- 'Ahmedabad Metro Phase-2 Gets Green Signal â€” New Routes Announced',
+ 'Ahmedabad Metro Phase-2 Gets Green Signal — New Routes Announced',
  'ahmedabad-metro-phase-2-approved',
  'The Ahmedabad Metro Phase-2 project has received approval, adding 28.5 km of new metro lines connecting key areas of the city.',
  '<p>The Gujarat government has given the green signal to Ahmedabad Metro Phase-2, which will add 28.5 kilometres of new metro lines to the city\'s growing rapid transit network.</p>
@@ -301,13 +299,13 @@ VALUES
     <li><strong>Corridor 1:</strong> Motera to Mahatma Mandir (15.6 km)</li>
     <li><strong>Corridor 2:</strong> GNLU to Hansol (12.9 km)</li>
 </ul>
-<p>The project is estimated to cost â‚¹7,500 crore and is expected to be completed by 2029. It will serve an estimated 4 lakh daily passengers.</p>
+<p>The project is estimated to cost ₹7,500 crore and is expected to be completed by 2029. It will serve an estimated 4 lakh daily passengers.</p>
 <p>Chief Minister stated that this expansion will significantly improve connectivity for students, professionals, and residents across Ahmedabad.</p>',
  'uploads/news/ahmedabad-metro-rail.jpg',
  'published', 0, 1, 562,
  '2026-09-24 10:15:00'),
 
--- Article 4: Regular â€” India (category 1)
+-- Article 4: Regular — India (category 1)
 (1, 1,
  'Union Budget 2026: Key Highlights for Education and Technology Sectors',
  'union-budget-2026-education-technology',
@@ -315,14 +313,14 @@ VALUES
  '<p>Finance Minister presented the Union Budget 2026-27 in Parliament today, with major focus on education and technology sectors.</p>
 <p><strong>Education Highlights:</strong></p>
 <ul>
-    <li>â‚¹1.5 lakh crore allocation for education â€” a 15% increase</li>
+    <li>₹1.5 lakh crore allocation for education — a 15% increase</li>
     <li>New National Digital University to serve 10 million students</li>
     <li>AI-integrated curriculum for all universities by 2028</li>
     <li>50,000 new scholarships for STEM students</li>
 </ul>
 <p><strong>Technology Highlights:</strong></p>
 <ul>
-    <li>â‚¹25,000 crore for semiconductor manufacturing</li>
+    <li>₹25,000 crore for semiconductor manufacturing</li>
     <li>Tax incentives for AI and ML startups</li>
     <li>Digital infrastructure push for Tier-2 and Tier-3 cities</li>
 </ul>
@@ -331,9 +329,9 @@ VALUES
  'published', 0, 0, 1105,
  '2026-09-22 09:00:00'),
 
--- Article 5: Regular â€” Business (category 6)
+-- Article 5: Regular — Business (category 6)
 (6, 1,
- 'Indian IT Industry Projects 12% Growth in FY2027 â€” AI Services Lead the Surge',
+ 'Indian IT Industry Projects 12% Growth in FY2027 — AI Services Lead the Surge',
  'indian-it-industry-12-percent-growth',
  'India\'s IT industry is projected to grow at 12% in FY2027, driven primarily by demand for AI and ML services globally.',
  '<p>The National Association of Software and Services Companies (NASSCOM) has projected a 12% growth rate for India\'s IT industry in FY2027, with revenues expected to cross $300 billion.</p>
@@ -350,18 +348,18 @@ VALUES
  'published', 0, 0, 734,
  '2026-09-21 11:00:00'),
 
--- Article 6: Regular â€” Sports (category 8)
+-- Article 6: Regular — Sports (category 8)
 (8, 1,
- 'India Clinches Historic Test Series Victory in Australia â€” 3-1 Triumph',
+ 'India Clinches Historic Test Series Victory in Australia — 3-1 Triumph',
  'india-test-series-victory-australia',
  'Team India has won the Border-Gavaskar Trophy with a convincing 3-1 series victory in Australia, creating history.',
  '<p>Team India has created history by winning the Border-Gavaskar Trophy on Australian soil with a commanding 3-1 series victory.</p>
 <p>The decisive fifth Test in Sydney saw India chase down a target of 287 runs with 4 wickets to spare. The series was marked by outstanding performances from both bat and ball.</p>
 <p><strong>Top performers of the series:</strong></p>
 <ul>
-    <li>Batting â€” 487 runs at an average of 54.11</li>
-    <li>Bowling â€” 28 wickets at an average of 19.32</li>
-    <li>Best innings â€” 176 runs in Melbourne</li>
+    <li>Batting — 487 runs at an average of 54.11</li>
+    <li>Bowling — 28 wickets at an average of 19.32</li>
+    <li>Best innings — 176 runs in Melbourne</li>
 </ul>
 <p>The BCCI congratulated the team, calling it "one of the greatest achievements in Indian cricket history."</p>
 <p>Captain said in the post-match ceremony: "This team has belief, resilience and hunger. We came here to win, and we did."</p>',
@@ -369,7 +367,7 @@ VALUES
  'published', 0, 0, 2340,
  '2026-09-20 18:00:00'),
 
--- Article 7: Regular â€” Education (category 7)
+-- Article 7: Regular — Education (category 7)
 (7, 1,
  'Leading National Universities Introduce Advanced AI Curriculum Framework',
  'national-universities-advanced-ai-curriculum',
@@ -385,12 +383,12 @@ VALUES
     <li>Capstone Projects with Industry Mentorship</li>
 </ul>
 <p>The program is designed to produce industry-ready AI professionals who can contribute to India\'s rapidly growing tech ecosystem.</p>
-<p>"Students will not just learn AI theory â€” they will build real AI solutions that address pressing societal and industrial challenges," said academic council representatives.</p>',
+<p>"Students will not just learn AI theory — they will build real AI solutions that address pressing societal and industrial challenges," said academic council representatives.</p>',
  'uploads/news/ai-curriculum-framework.jpg',
  'published', 0, 0, 456,
  '2026-09-19 10:00:00'),
 
--- Article 8: Regular â€” Entertainment (category 9)
+-- Article 8: Regular — Entertainment (category 9)
 (9, 1,
  'Indian Film "The Last Algorithm" Wins Best Picture at International Film Festival',
  'indian-film-last-algorithm-wins',
@@ -403,7 +401,7 @@ VALUES
  'published', 0, 0, 678,
  '2026-09-18 16:00:00'),
 
--- Article 9: Regular â€” World (category 3)
+-- Article 9: Regular — World (category 3)
 (3, 1,
  'Global AI Safety Summit 2026: World Leaders Agree on AI Governance Framework',
  'global-ai-safety-summit-2026',

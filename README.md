@@ -1,4 +1,4 @@
-# Dynamic News Portal
+# Dynamic News Portal & Content Management System
 
 ## Project Definition
 Publish news dynamically.
@@ -7,167 +7,144 @@ Publish news dynamically.
 TYBScIT (AI/ML)  
 GLS University
 
-## Overview
-The Dynamic News Portal is a web-based platform built with PHP and MySQL that allows visitors to browse the latest news articles across multiple categories. It provides administrators and editors with a secure, responsive dashboard to seamlessly create, edit, manage, and publish news content to the public dynamically. The project utilizes a native page-controller architecture and implements security features such as CSRF protection, password hashing, and prepared statements.
+---
 
-## Objectives
-- To develop a dynamic, data-driven web application without relying on external frontend or backend frameworks (excluding Bootstrap).
-- To provide a functional Content Management System (CMS) tailored specifically for news publishing.
-- To demonstrate practical knowledge of CRUD operations, relational databases, user authentication, and web security best practices (e.g., preventing XSS, CSRF, and SQL Injection).
+## Live Deployment & Verified URLs
+
+- **Public News Website:** [https://dynamic-news-portal-rose.vercel.app](https://dynamic-news-portal-rose.vercel.app)
+- **Editorial Management Portal (CMS):** [https://dynamic-news-portal-rose.vercel.app/admin/login.php](https://dynamic-news-portal-rose.vercel.app/admin/login.php)
+- **Deployment Platform:** Vercel Serverless (`vercel-php@0.9.0`)
+- **Production Database:** TiDB Cloud Serverless MySQL (Encrypted TLS/SSL)
+
+---
+
+## Overview
+The Dynamic News Portal is a high-performance web platform built with PHP 8.3, MySQL, and modern Vanilla CSS / Bootstrap 5. It allows readers to browse real-time breaking news, trending articles, and category-filtered stories, while providing editors and administrators with a restricted SaaS-style management portal to author, curate, moderate comments, and publish news content dynamically.
+
+The application utilizes a clean page-controller architecture and incorporates defense-in-depth security:
+- Anti-CSRF protection via 64-hex tokens and `hash_equals()`
+- Password hashing using standard Bcrypt (`PASSWORD_DEFAULT`)
+- SQL injection immunity through 100% PDO prepared statements
+- Context-aware XSS escaping (`htmlspecialchars()`)
+- Database-backed cross-container session management for stateless serverless environments
+
+---
 
 ## Features
 
 ### Public Portal
-* Homepage
-* Breaking news
-* Featured news
-* Latest news
-* Trending news
-* Category browsing
-* Search
-* Article details
-* Comments
-* Likes
-* Newsletter subscription
-* Contact form
+* **Breaking News Ticker:** Dynamic marquee highlighting critical real-time alerts.
+* **Hero Editorial Grid:** Prominent featured stories with category metadata.
+* **Latest & Trending News:** Automated view-counting sidebar and latest publication feeds.
+* **Taxonomy Browsing:** Dynamic category-specific archives (e.g., AI & ML, Technology, Gujarat, India, Business, Sports).
+* **Live Search:** Fast keyword search engine with pagination and query sanitization.
+* **Interactive Article Reader:** Full article views, reading time calculations, author credits, and reader comments.
+* **Engagement Engine:** AJAX article like toggler and newsletter subscription.
+* **Reader Inquiries:** Contact form with database storage and administrative inbox notification.
 
-### Authentication
-* Registration
-* Login
-* Logout
-* Profile
-* Role-based access
+### Authentication & Authorization
+* Role-based access control (RBAC): `admin`, `editor`, and `user` roles.
+* Public user registration, secure login, profile management, and logout.
+* Administrative session guards (`requireAdmin()`, `requireEditor()`) protecting management routes.
+* Secure cookie attributes (`HttpOnly`, `SameSite=Lax`, `Secure`).
 
-### Admin
-* Dashboard
-* News management
-* Category management
-* User management
-* Comment moderation
-* Newsletter management
-* Contact message management
+### Editorial CMS (`admin/`)
+* **Analytics Dashboard:** Article counts, total views, active categories, pending comments, inbox inquiries, and subscribers.
+* **Article Publishing:** Rich article authoring, editing, status toggling (draft/published), breaking/featured flags, and image upload with `.htaccess` execution locks.
+* **Category Management:** Full CRUD operations and live slug generation.
+* **User & Staff Administration:** Role management, account status activation, and staff creation.
+* **Comment Moderation:** Editorial approval and deletion queues.
+* **Subscriber Management:** Email list viewing, activation toggling, and one-click CSV export.
+* **Contact Inbox:** Real-time reader message viewing, unread flags, and reply tracking.
+
+---
 
 ## Technology Stack
 
-Frontend:
-- HTML5
-- CSS3
-- Bootstrap 5
-- JavaScript
+- **Backend:** PHP 8.3+ (Native Page-Controller Architecture, PDO)
+- **Frontend:** HTML5, CSS3 (Modern SaaS design tokens), Bootstrap 5.3, JavaScript (ES6+)
+- **Database:** MySQL 8.0+ / TiDB Cloud Serverless MySQL
+- **Web Servers:** Vercel Serverless (Production), Dual PHP CLI built-in servers (Local Development), Apache/XAMPP compatible
 
-Backend:
-- PHP 8+
-
-Database:
-- MySQL
-
-Database Access:
-- PDO (PHP Data Objects)
-
-Environment:
-- XAMPP
+---
 
 ## Database Schema
-The database consists of the following 7 core tables:
+The database consists of 7 normalized relational tables:
+1. `users`: Authenticated user credentials, bcrypt password hashes, and authorization roles (`admin`, `editor`, `user`).
+2. `categories`: News article categories, descriptions, and URL slugs.
+3. `news`: Core article table storing titles, slugs, summaries, content, timestamps, view counts, and category/author foreign keys.
+4. `comments`: Reader comments attached to news articles with an approval state for moderation.
+5. `likes`: Unique user-to-article like tracking table enforcing one like per user per article.
+6. `contact_messages`: Reader inquiries submitted through the contact desk.
+7. `newsletter_subscribers`: Verified subscriber email registry.
 
-1. **users**: Stores authenticated users, their hashed passwords, and their authorization roles (`admin`, `editor`, `user`).
-2. **categories**: Defines the organizational structure for news articles, tracking names and URL slugs.
-3. **news**: The core content table storing article metadata, HTML content, status (draft/published/archived), relationships to authors and categories, and visibility flags (breaking/featured).
-4. **comments**: Stores user-submitted comments attached to specific news articles, incorporating an approval state for moderation.
-5. **likes**: A tracking table managing many-to-many relationships denoting which user liked which news article (enforced uniquely).
-6. **contact_messages**: Stores inquiries submitted through the public contact form.
-7. **newsletter_subscribers**: Tracks unique email addresses of users requesting future updates.
+---
 
-## Installation Guide
+## Local Setup & Development
 
-Follow these steps to deploy the project locally using XAMPP:
+### Option A: Dual-Port Local Server (Recommended)
+This runs the public portal on port 8000 and the admin portal on port 9000:
+1. Double-click `start-dual-servers.bat` (or run `./start-dual-servers.ps1`).
+2. Access the public portal: [http://localhost:8000](http://localhost:8000)
+3. Access the admin portal: [http://localhost:9000/login.php](http://localhost:9000/login.php)
+4. To stop the servers, double-click `stop-dual-servers.bat`.
 
-1. Install XAMPP.
-2. Start Apache via the XAMPP Control Panel.
-3. Start MySQL via the XAMPP Control Panel.
-4. Copy the entire project folder into the XAMPP `htdocs` directory (e.g., `C:\xampp\htdocs\SONI_PHP_WEBSITE`).
-5. Open `http://localhost/phpmyadmin` and create a database named `news_portal`.
-6. Import the database schema (locate `database/news_portal.sql` and run it via the Import tab).
-7. Configure the database connection if necessary by editing `config/database.php` (it defaults to `root` with no password).
-8. Open the local project URL (e.g., `http://localhost/SONI_PHP_WEBSITE`) in your browser.
+### Option B: Apache / XAMPP
+1. Copy the project into your web root (e.g., `C:/xampp/htdocs/SONI_PHP_WEBSITE`).
+2. Start Apache and MySQL in XAMPP.
+3. Open `http://localhost/phpmyadmin` and import `database/news_portal.sql`.
+4. Browse to [http://localhost/SONI_PHP_WEBSITE](http://localhost/SONI_PHP_WEBSITE).
+
+---
+
+## Environment Variables
+
+For cloud or custom deployments, configure the following variables in `.env` or your hosting dashboard:
+
+| Variable | Description | Example / Default |
+|---|---|---|
+| `DB_HOST` | Database host | `gateway01.ap-northeast-1.prod.aws.tidbcloud.com` |
+| `DB_PORT` | Database port | `4000` (TiDB) or `3306` (Local MySQL) |
+| `DB_NAME` | Database schema name | `news_portal` |
+| `DB_USER` | Database username | `root` |
+| `DB_PASS` | Database password | `********` |
+| `DB_SSL` | Enable TLS/SSL connection | `true` (Cloud) or `false` (Local) |
+| `APP_ENV` | Environment mode | `production` or `development` |
+| `APP_URL` | Public application URL | `https://dynamic-news-portal-rose.vercel.app` |
+
+---
 
 ## Demonstration Accounts
-When importing `database/news_portal.sql`, the following pre-seeded test accounts are available:
+
+Importing `database/news_portal.sql` or `database/production_schema.sql` seeds the following test accounts:
 * **Administrator:** `admin@newsportal.local` / `NewsPortal@2026`
 * **Editor:** `editor@newsportal.local` / `Editor@2026`
 * **Reader:** `user@newsportal.local` / `User@2026`
 
-*Security Note: Change default passwords through the Admin Users panel before any public demonstration.*
+*Security Note: Default passwords should be updated before public demonstrations.*
 
-## Automated Test Execution
-Run the complete automated test suite (38 verification checks covering database connectivity, Bcrypt verification, CSRF, XSS escaping, SQL injection isolation, transactional CRUD, and live HTTP routes):
+---
+
+## Automated Test Suite
+
+Run the full automated test suite (38 checks covering database connection, schema tables, bcrypt auth, CSRF, XSS escaping, SQL injection isolation, transactional CRUD, and live HTTP routes):
+
 ```bash
-php -f run_tests.php
+php run_tests.php
 ```
 
-## Security & Architectural Reports
-Detailed documentation and quality assurance audits are available in the project root:
-* [PROJECT_AUDIT_REPORT.md](file:///c:/Users/dixit/OneDrive/Desktop/COLLEGE_PROJECT/SONI_PHP_WEBSITE/PROJECT_AUDIT_REPORT.md) — Comprehensive code and route audit.
-* [UI_UX_IMPROVEMENTS.md](file:///c:/Users/dixit/OneDrive/Desktop/COLLEGE_PROJECT/SONI_PHP_WEBSITE/UI_UX_IMPROVEMENTS.md) — Editorial UI/UX transformation & viewport tests.
-* [DATABASE_AND_SECURITY_AUDIT.md](file:///c:/Users/dixit/OneDrive/Desktop/COLLEGE_PROJECT/SONI_PHP_WEBSITE/DATABASE_AND_SECURITY_AUDIT.md) — Schema integrity, PDO binding, and security controls.
-* [PRODUCTION_DEPLOYMENT_REPORT.md](file:///c:/Users/dixit/OneDrive/Desktop/COLLEGE_PROJECT/SONI_PHP_WEBSITE/PRODUCTION_DEPLOYMENT_REPORT.md) — Deployment instructions, persistent storage, and .env configuration.
-* [TEST_RESULTS.md](file:///c:/Users/dixit/OneDrive/Desktop/COLLEGE_PROJECT/SONI_PHP_WEBSITE/TEST_RESULTS.md) — Automated & manual test pass logs (38/38 PASS).
-* [VIVA_NOTES.md](file:///c:/Users/dixit/OneDrive/Desktop/COLLEGE_PROJECT/SONI_PHP_WEBSITE/VIVA_NOTES.md) — 30 viva questions and concise answers for college defense.
-
-## Project Structure
-```text
-Dynamic News Portal/
-│
-├── admin/                 # Restricted dashboard panel
-│   ├── categories/        # Category management (CRUD)
-│   ├── comments/          # Comment moderation queue
-│   ├── includes/          # Admin headers, sidebars, footers
-│   ├── messages/          # Contact inquiries viewer
-│   ├── newsletter/        # Newsletter subscribers & CSV export
-│   ├── news/              # News article management & image upload
-│   ├── users/             # User management & role assignment
-│   ├── index.php          # Admin metrics dashboard
-│   ├── login.php          # Admin login controller
-│   └── logout.php         # Admin logout
-│
-├── assets/                # Static frontend assets
-│   ├── css/               # Bootstrap 5 & editorial styles (style.css)
-│   ├── js/                # Scripts & Bootstrap bundle
-│   └── images/            # Default fallback images & logos
-│
-├── config/                # Environment configuration
-│   └── database.php       # Centralized PDO connection & .env loader
-│
-├── database/              # Schema and test structures
-│   └── news_portal.sql    # Complete MySQL schema & seed data
-│
-├── errors/                # Global generic error pages (403, 404)
-│
-├── includes/              # Shared utilities, auth guards, headers/footers
-│   ├── auth.php           # RBAC authorization middleware
-│   ├── csrf.php           # CSRF token generator & validator
-│   ├── functions.php      # Reusable helpers & output escaper
-│   ├── header.php         # HTML document head & Open Graph tags
-│   ├── navbar.php         # Masthead, navigation & breaking ticker
-│   └── footer.php         # Public footer & navigation links
-│
-├── uploads/               # Dynamic binary storage
-│   └── news/              # Uploaded images (protected by .htaccess)
-│
-├── .env.example           # Production environment configuration template
-├── robots.txt             # Search crawler directives
-├── sitemap.php            # Dynamic XML sitemap generator
-├── index.php              # Public homepage
-├── news.php               # Article read page with comments & likes
-├── category.php           # Category archive with pagination
-├── search.php             # Search engine & sorting controller
-├── about.php              # About page
-├── contact.php            # Contact form
-├── login.php              # User login
-├── register.php           # User registration
-├── logout.php             # User logout
-├── profile.php            # User profile management
-├── run_tests.php          # Automated test suite (38 checks)
-├── VIVA_NOTES.md          # College viva defense prep (30 Q&As)
-└── README.md              # Project documentation
+To test against a specific deployment (such as Vercel production):
+```bash
+TEST_BASE_URL="https://dynamic-news-portal-rose.vercel.app" php run_tests.php
 ```
+
+---
+
+## Project Documentation & Architecture Guides
+
+* [PROJECT_STRUCTURE.md](file:///c:/Users/dixit/OneDrive/Desktop/COLLEGE_PROJECT/SONI_PHP_WEBSITE/PROJECT_STRUCTURE.md) — Comprehensive directory tree & architectural guide.
+* [CLEANUP_REPORT.md](file:///c:/Users/dixit/OneDrive/Desktop/COLLEGE_PROJECT/SONI_PHP_WEBSITE/CLEANUP_REPORT.md) — Master cleanup, audit, duplicate removal, and validation report.
+* [docs/VIVA_NOTES.md](file:///c:/Users/dixit/OneDrive/Desktop/COLLEGE_PROJECT/SONI_PHP_WEBSITE/docs/VIVA_NOTES.md) — 30 viva questions and concise answers for academic project defense.
+* [docs/VERCEL_DEPLOYMENT_GUIDE.md](file:///c:/Users/dixit/OneDrive/Desktop/COLLEGE_PROJECT/SONI_PHP_WEBSITE/docs/VERCEL_DEPLOYMENT_GUIDE.md) — Production serverless deployment & TiDB Cloud manual.
+* [docs/DUAL_LOCALHOST_SETUP.md](file:///c:/Users/dixit/OneDrive/Desktop/COLLEGE_PROJECT/SONI_PHP_WEBSITE/docs/DUAL_LOCALHOST_SETUP.md) — Dual local server operations manual (ports 8000 and 9000).
+* [docs/reports/](file:///c:/Users/dixit/OneDrive/Desktop/COLLEGE_PROJECT/SONI_PHP_WEBSITE/docs/reports/) — Historical audit, UI/UX transformation, QA, and security logs.

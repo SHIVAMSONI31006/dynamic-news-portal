@@ -6,9 +6,9 @@ start-dual-servers.*
 stop-both.*
 stop-dual-servers.*
 run_tests.php
-test_routes.php
-database_test.php
+tests/
 *.md
+docs/
 Dockerfile
 .dockerignore
 logs/

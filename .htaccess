@@ -8,9 +8,14 @@ DirectoryIndex index.php
 Options -Indexes
 
 # Protect sensitive files and directories
-<FilesMatch "^\.env|\.git|\.dual_servers|\.sql$|\.log$|run_tests\.php|test_routes\.php">
+<FilesMatch "^\.env|\.git|\.dual_servers|\.sql$|\.log$|run_tests\.php">
     Require all denied
 </FilesMatch>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(tests|docs|config|database|includes|errors)/ - [F,L]
+</IfModule>
 
 # Allow access to robots.txt, sitemap.php, and static assets
 <FilesMatch "^(robots\.txt|sitemap\.php)$">

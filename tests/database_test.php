@@ -19,8 +19,8 @@
  * ============================================================
  */
 
-require_once __DIR__ . '/config/database.php';
-require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../includes/auth.php';
 
 // Security Guard: Disable diagnostic script in production
 if (defined('APP_ENV') && APP_ENV === 'production') {

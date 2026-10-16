@@ -4,9 +4,10 @@ Disallow: /config/
 Disallow: /database/
 Disallow: /includes/
 Disallow: /errors/
+Disallow: /tests/
+Disallow: /docs/
 Disallow: /profile.php
-Disallow: /database_test.php
-Disallow: /test_routes.php
+Disallow: /run_tests.php
 
 Allow: /
 Allow: /index.php
