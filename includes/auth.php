@@ -13,6 +13,8 @@
  * ============================================================
  */
 
+require_once __DIR__ . '/../config/database.php';
+
 /**
  * Start or resume a secure PHP session.
  * Safe to call multiple times — only starts if not already active.
@@ -34,8 +36,10 @@ function startSession(): void
     // Separate session cookie names to prevent cookie collisions on localhost
     $sessionName = $isAdmin ? 'NEWS_ADMIN_SESSION' : 'NEWS_PUBLIC_SESSION';
 
-    // Session configuration — secure defaults
-    $isSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+    // Session configuration — secure defaults across localhost and cloud reverse proxies
+    $isSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+             || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+             || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] === 'on');
 
     session_set_cookie_params([
         'lifetime' => 0,              // Until browser closes
@@ -45,6 +49,49 @@ function startSession(): void
         'httponly' => true,           // Not accessible via JavaScript
         'samesite' => 'Lax',          // CSRF protection via SameSite
     ]);
+
+    // On Vercel serverless functions, store sessions in MySQL so all Lambda containers share login state
+    $isVercel = !empty(getenv('VERCEL')) || !empty($_ENV['VERCEL']) || !empty($_SERVER['VERCEL']);
+    if ($isVercel && function_exists('connectDB')) {
+        try {
+            $pdo = connectDB();
+            session_set_save_handler(new class($pdo) implements SessionHandlerInterface {
+                private PDO $pdo;
+                public function __construct(PDO $pdo) { $this->pdo = $pdo; }
+                public function open(string $path, string $name): bool { return true; }
+                public function close(): bool { return true; }
+                public function read(string $id): string|false {
+                    try {
+                        $stmt = $this->pdo->prepare("SELECT data FROM sessions WHERE id = :id AND last_activity > :expiry");
+                        $stmt->execute([':id' => $id, ':expiry' => time() - 86400]);
+                        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                        return $row ? (string)$row['data'] : '';
+                    } catch (\Throwable $e) { return ''; }
+                }
+                public function write(string $id, string $data): bool {
+                    try {
+                        $stmt = $this->pdo->prepare("REPLACE INTO sessions (id, data, last_activity) VALUES (:id, :data, :time)");
+                        return $stmt->execute([':id' => $id, ':data' => $data, ':time' => time()]);
+                    } catch (\Throwable $e) { return false; }
+                }
+                public function destroy(string $id): bool {
+                    try {
+                        $stmt = $this->pdo->prepare("DELETE FROM sessions WHERE id = :id");
+                        return $stmt->execute([':id' => $id]);
+                    } catch (\Throwable $e) { return false; }
+                }
+                public function gc(int $max_lifetime): int|false {
+                    try {
+                        $stmt = $this->pdo->prepare("DELETE FROM sessions WHERE last_activity < :expiry");
+                        $stmt->execute([':expiry' => time() - $max_lifetime]);
+                        return $stmt->rowCount();
+                    } catch (\Throwable $e) { return 0; }
+                }
+            }, true);
+        } catch (\Throwable $e) {
+            // Fallback to standard file sessions if DB is unavailable
+        }
+    }
 
     session_name($sessionName);
     session_start();
