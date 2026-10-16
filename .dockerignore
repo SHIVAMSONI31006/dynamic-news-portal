@@ -1,0 +1,11 @@
+.git/
+.env
+.env.local
+.dual_servers.json
+logs/
+scratch/
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini
+.DS_Store

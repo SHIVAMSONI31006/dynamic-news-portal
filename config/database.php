@@ -57,6 +57,7 @@ if (!defined('DB_NAME'))   define('DB_NAME', env('DB_NAME', 'news_portal'));
 if (!defined('DB_USER'))   define('DB_USER', env('DB_USER', 'root'));
 if (!defined('DB_PASS'))   define('DB_PASS', env('DB_PASS', '')); // Default XAMPP has no password
 if (!defined('DB_CHARSET'))define('DB_CHARSET', env('DB_CHARSET', 'utf8mb4'));
+if (!defined('DB_SSL'))    define('DB_SSL', filter_var(env('DB_SSL', false), FILTER_VALIDATE_BOOLEAN));
 
 /**
  * Returns a PDO database connection instance.
@@ -89,6 +90,11 @@ function connectDB(): PDO
             // Force connection character set to utf8mb4
             PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES " . DB_CHARSET . " COLLATE utf8mb4_unicode_ci",
         ];
+
+        // Support SSL/TLS for cloud database connections (e.g., TiDB Serverless, Aiven, Azure MySQL)
+        if (defined('DB_SSL') && DB_SSL === true) {
+            $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
+        }
 
         try {
             $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);

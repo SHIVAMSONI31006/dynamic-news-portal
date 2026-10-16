@@ -1,0 +1,26 @@
+# ============================================================
+# DYNAMIC NEWS PORTAL — APACHE WEB SERVER CONFIGURATION
+# ============================================================
+
+DirectoryIndex index.php
+
+# Prevent directory indexing
+Options -Indexes
+
+# Protect sensitive files and directories
+<FilesMatch "^\.env|\.git|\.dual_servers|\.sql$|\.log$|run_tests\.php|test_routes\.php">
+    Require all denied
+</FilesMatch>
+
+# Allow access to robots.txt, sitemap.php, and static assets
+<FilesMatch "^(robots\.txt|sitemap\.php)$">
+    Require all granted
+</FilesMatch>
+
+# Security Headers
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
